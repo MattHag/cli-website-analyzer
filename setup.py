@@ -14,6 +14,7 @@ DEV_REQUIREMENTS = [
     'flake8 == 4.*',
     'isort == 5.*',
     'mypy == 0.942',
+    'pre-commit == 2.20.*',
     'pytest == 7.*',
     'pytest-cov == 4.*',
     'twine == 4.*',
