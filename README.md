@@ -5,7 +5,7 @@
 Checks loading of external resources and cookies without consent.
 
 [![Build Status](https://github.com/MattHag/gdpr-website-checker-cli/workflows/build/badge.svg)](https://github.com/MattHag/gdpr-website-checker-cli/actions)
-[![Coverage Status](https://coveralls.io/repos/github/MattHag/gdpr-website-checker-cli/badge.svg?branch=main)](https://coveralls.io/github/MattHag/gdpr-website-checker-cli?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/MattHag/gdpr-website-checker-cli/badge.svg?branch=main&t=o2BiJf)](https://coveralls.io/github/MattHag/gdpr-website-checker-cli?branch=main)
 [![PyPi](https://img.shields.io/pypi/v/gdpr-website-checker-cli)](https://pypi.org/project/gdpr-website-checker-cli)
 [![Licence](https://img.shields.io/github/license/MattHag/gdpr-website-checker-cli)](LICENSE)
 
