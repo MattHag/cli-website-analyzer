@@ -1,5 +1,5 @@
-import project_name
+import website_checker
 
 
 def test_main():
-    project_name.main()
+    website_checker.main()
