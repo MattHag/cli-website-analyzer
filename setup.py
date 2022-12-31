@@ -4,6 +4,8 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 REQUIREMENTS = [
+    'beautifulsoup4 == 4.*',
+    'types-beautifulsoup4 == 4.*',
     'jinja2 == 3.*',
     'playwright == 1.*',
 ]

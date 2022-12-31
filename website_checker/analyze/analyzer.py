@@ -1,6 +1,9 @@
 from typing import List, Union
 
 from website_checker.analyze.result import PageResult
+from website_checker.check.cookies import CheckCookies
+from website_checker.check.external_network_access import CheckExternalNetworkAccess
+from website_checker.check.h1_headings import CheckH1Headings
 
 
 class Analyzer:
@@ -10,7 +13,7 @@ class Analyzer:
 
     def _register_analyzer_classes(self):
         # TODO Retrieve analyzers dynamically
-        classes = []
+        classes = [CheckCookies, CheckExternalNetworkAccess, CheckH1Headings]
         for cls in classes:
             if cls.__name__ not in self.registry:
                 self.registry[cls.__name__] = cls
