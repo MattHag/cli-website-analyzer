@@ -1,0 +1,26 @@
+{% block content %}
+<section>
+    <h2>{{ page.title }}</h2>
+    <p>{{ page.url }}</p>
+
+    {%- for evaluation in page.results -%}
+    <h3>{{ evaluation.title }}</h3>
+    {% if evaluation.result %}
+    <p>{{ evaluation.result }}</p>
+    {% elif evaluation.results %}
+    <table class="cookie_table">
+        <thead>
+        <tr>
+            <th>Name</th>
+        </tr>
+        </thead>
+        {% for name in evaluation.results %}
+        <tr>
+            <td>{{ name }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    {% endfor %}
+</section>
+{% endblock %}
