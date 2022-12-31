@@ -1,0 +1,7 @@
+section {
+    page-break-before: always;
+}
+
+@page  {
+    size: A4;
+}

@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <style type="text/css">
+        {% include "layout.css" %}
+    </style>
+</head>
+<body>
+    {%- include 'frontpage_template.html' -%}
+    <div class="content">
+        {% for page in pages %}
+            {%- include 'section_template.html' -%}
+        {% endfor %}
+    </div>
+</body>
+</html>

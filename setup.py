@@ -4,6 +4,7 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 REQUIREMENTS = [
+    'jinja2 == 3.*',
     'playwright == 1.*',
 ]
 
