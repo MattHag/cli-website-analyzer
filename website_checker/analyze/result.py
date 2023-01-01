@@ -1,5 +1,7 @@
 class PageResult:
-    def __init__(self, url: str, title: str, results: list = []):
+    def __init__(self, url: str, title: str, results=None):
+        if results is None:
+            results = []
         self.url = url
         self.title = title
         self.results = results
