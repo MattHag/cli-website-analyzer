@@ -21,6 +21,8 @@ DEV_REQUIREMENTS = [
     'pre-commit == 2.20.*',
     'pytest == 7.*',
     'pytest-cov == 4.*',
+    'sphinx == 4.*',
+    'sphinx-rtd-theme == 1.*',
     'twine == 4.*',
 ]
 
