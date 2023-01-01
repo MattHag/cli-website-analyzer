@@ -8,6 +8,7 @@ from website_checker.crawl.crawler import Crawler
 
 @pytest.fixture
 def mock_crawler(page):
+    # TODO replace with mock of playwright goto
     with patch.object(Crawler, "next") as mock_crawler_next:
         mock_crawler_next.return_value = page
         with Crawler() as c:

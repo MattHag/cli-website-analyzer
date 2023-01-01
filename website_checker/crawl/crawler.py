@@ -33,14 +33,14 @@ class Crawler(CrawlerBase):
         self._network_requests = []  # reset
         next_url = self._get_next_url()
 
-        page = self._page.goto(next_url)
-        html = page.content()
-        temp_cookies = page.context.cookies()
+        self._page.goto(next_url)
+        html = self._page.content()
+        temp_cookies = self._page.context.cookies()
         cookies = [Cookie(name=cookie["name"]) for cookie in temp_cookies]
 
         return Page(
-            url=page.url,
-            title=page.title(),
+            url=self._page.url,
+            title=self._page.title(),
             html=html,
             cookies=cookies,
             elements=self._network_requests,
