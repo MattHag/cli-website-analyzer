@@ -1,22 +1,29 @@
-from typing import List, Union
+import glob
+from importlib.machinery import SourceFileLoader
+from pathlib import Path
+from typing import Any, Dict, List, Union
 
+from website_checker.analyze.base_analyzer import BaseAnalyzer
 from website_checker.analyze.result import PageResult
-from website_checker.check.cookies import CheckCookies
-from website_checker.check.external_network_access import CheckExternalNetworkAccess
-from website_checker.check.h1_headings import CheckH1Headings
+
+check_dir = Path(__file__).parent.parent / "check"
+
+
+def load_modules(package):
+    """Loads all modules in a package."""
+    for module in glob.glob(str(package / "**/*.py"), recursive=True):
+        stem = Path(module).stem
+        SourceFileLoader(stem, module).load_module()
 
 
 class Analyzer:
-    def __init__(self):
-        self.registry = {}
-        self._register_analyzer_classes()
+    registry: Dict[str, Any] = {}
 
-    def _register_analyzer_classes(self):
-        # TODO Retrieve analyzers dynamically
-        classes = [CheckCookies, CheckExternalNetworkAccess, CheckH1Headings]
-        for cls in classes:
-            if cls.__name__ not in self.registry:
-                self.registry[cls.__name__] = cls
+    def __init__(self):
+        if not self.__class__.registry:
+            load_modules(check_dir)
+            classes = {cls.__name__: cls for cls in BaseAnalyzer.__subclasses__()}
+            self.__class__.registry = classes
 
     def run(self, page: Union[PageResult, List[PageResult]]):
         return self._evaluate(page)
@@ -24,7 +31,7 @@ class Analyzer:
     def _evaluate(self, page):
         """Runs all evaluations and collects the results."""
         page_result = PageResult(url=page.url, title=page.title)
-        for analyzer_class in self.registry.values():
+        for analyzer_class in self.__class__.registry.values():
             result = analyzer_class().check(page)
             if result:
                 page_result.add_evaluation(result.as_dict())
