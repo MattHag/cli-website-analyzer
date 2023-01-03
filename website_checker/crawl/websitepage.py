@@ -3,7 +3,7 @@ from datetime import datetime
 from website_checker.crawl.cookie import Cookie
 
 
-class Page:
+class WebsitePage:
     def __init__(self, url="", title="", html="", cookies=None, elements=None):
         if elements is None:
             elements = []

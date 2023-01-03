@@ -1,6 +1,6 @@
 from website_checker.check.external_network_access import CheckExternalNetworkAccess
-from website_checker.crawl.page import Page
 from website_checker.crawl.resource import Resource
+from website_checker.crawl.websitepage import WebsitePage
 
 
 def test_check_external_network_access():
@@ -12,7 +12,7 @@ def test_check_external_network_access():
     ]
 
     expected_nr_results = len(resources) - 1
-    page = Page(url=domain, elements=resources)
+    page = WebsitePage(url=domain, elements=resources)
 
     res = CheckExternalNetworkAccess().check(page)
 
@@ -28,7 +28,7 @@ def test_check_no_external_network_access():
         Resource(url=f"{domain}/blog/hello_world"),
         Resource(url=f"{domain}/blog/hello_world_2"),
     ]
-    page = Page(url=domain, elements=resources)
+    page = WebsitePage(url=domain, elements=resources)
 
     res = CheckExternalNetworkAccess().check(page)
 

@@ -4,7 +4,7 @@ from playwright.sync_api import Response, sync_playwright
 
 from website_checker.crawl.cookie import Cookie
 from website_checker.crawl.crawlerbase import CrawlerBase
-from website_checker.crawl.page import Page
+from website_checker.crawl.websitepage import WebsitePage
 
 
 class Crawler(CrawlerBase):
@@ -29,7 +29,7 @@ class Crawler(CrawlerBase):
         for link in links:
             self._pages.put(link)
 
-    def next(self) -> Page:
+    def next(self) -> WebsitePage:
         self._network_requests = []  # reset
         next_url = self._get_next_url()
 
@@ -38,7 +38,7 @@ class Crawler(CrawlerBase):
         temp_cookies = self._page.context.cookies()
         cookies = [Cookie(name=cookie["name"]) for cookie in temp_cookies]
 
-        return Page(
+        return WebsitePage(
             url=self._page.url,
             title=self._page.title(),
             html=html,
