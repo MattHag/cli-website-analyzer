@@ -1,8 +1,8 @@
 import pytest
 
 from website_checker.crawl.cookie import Cookie
-from website_checker.crawl.page import Page
 from website_checker.crawl.resource import Resource
+from website_checker.crawl.websitepage import WebsitePage
 
 
 @pytest.fixture
@@ -32,7 +32,7 @@ def mock_source():
 
 @pytest.fixture
 def page(mock_cookies, mock_resources, mock_source):
-    return Page(
+    return WebsitePage(
         url="https://domain.test",
         title="Test page",
         html=mock_source,

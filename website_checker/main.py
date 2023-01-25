@@ -11,8 +11,10 @@ class WebsiteChecker:
         self.reporting = Report()
 
     def check(self, url) -> Path:
-        with Crawler() as crawler:
-            crawler.add_links(url)
-            page = crawler.next()
-        eval_list = self.analyzer.run(page)
+        eval_list = []
+        with Crawler(url) as crawler:
+            for page in crawler:
+                eval_result = self.analyzer.run(page)
+                eval_list.append(eval_result)
+        eval_list.sort(key=lambda x: x.url)
         return self.reporting.create(eval_list)
