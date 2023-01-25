@@ -56,7 +56,7 @@ def is_internal_link(url: str, domain: str) -> bool:
 
 class Crawler(CrawlerBase):
     def __init__(self, url: str):
-        self.url = get_base_domain(url)
+        self.domain = get_base_domain(url)
         self.collected_links: Set = set()
         self.visited_links: Set = set()
 
@@ -118,7 +118,7 @@ class Crawler(CrawlerBase):
             return link
         # root-relative link
         elif link.startswith("/"):
-            return f"{self.url}{link}"
+            return f"{self.domain}{link}"
         # relative link
         else:
             # urljoin requires a trailing slash
@@ -128,7 +128,7 @@ class Crawler(CrawlerBase):
 
     def _add_url(self, url):
         """Adds a url to the crawler."""
-        normalized_url = self.normalize_url(url, self.url)
+        normalized_url = self.normalize_url(url, self.domain)
         self.collected_links.add(normalized_url)
 
     def _collect_links(self, page: Page, current_url: str):
@@ -142,7 +142,7 @@ class Crawler(CrawlerBase):
         visited_links = {link.rstrip("/") for link in self.visited_links}
         unvisited_links = links - visited_links
 
-        internal_links = {link for link in unvisited_links if type(link) == str and is_internal_link(link, self.url)}
+        internal_links = {link for link in unvisited_links if type(link) == str and is_internal_link(link, self.domain)}
         images = (".png", ".jpg", ".jpeg", ".webp", "avif")
         unvisited_internal_pages = {link for link in internal_links if not link.endswith(images)}
         for link in unvisited_internal_pages:
