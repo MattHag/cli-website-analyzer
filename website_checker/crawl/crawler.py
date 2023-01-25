@@ -44,7 +44,7 @@ def get_base_domain(url: str) -> str:
 
 
 def is_internal_link(url: str, domain: str) -> bool:
-    """Checks if url is internal."""
+    """Checks if url is an internal link."""
     if url.startswith(domain):
         len_domain = len(domain)
         if len(url) == len_domain:
