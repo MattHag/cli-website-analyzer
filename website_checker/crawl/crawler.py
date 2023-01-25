@@ -43,6 +43,17 @@ def get_base_domain(url: str) -> str:
     )
 
 
+def is_internal_link(url: str, domain: str) -> bool:
+    """Checks if url is internal."""
+    if url.startswith(domain):
+        len_domain = len(domain)
+        if len(url) == len_domain:
+            return True
+        if url[len_domain] == "/":
+            return True
+    return False
+
+
 class Crawler(CrawlerBase):
     def __init__(self, url: str):
         self.url = get_base_domain(url)
@@ -131,7 +142,7 @@ class Crawler(CrawlerBase):
         visited_links = {link.rstrip("/") for link in self.visited_links}
         unvisited_links = links - visited_links
 
-        internal_links = {link for link in unvisited_links if type(link) == str and link.startswith(self.url)}
+        internal_links = {link for link in unvisited_links if type(link) == str and is_internal_link(link, self.url)}
         images = (".png", ".jpg", ".jpeg", ".webp", "avif")
         unvisited_internal_pages = {link for link in internal_links if not link.endswith(images)}
         for link in unvisited_internal_pages:

@@ -4,7 +4,7 @@ import playwright
 import pytest
 
 from website_checker.crawl.cookie import Cookie
-from website_checker.crawl.crawler import Crawler, get_base_domain
+from website_checker.crawl.crawler import Crawler, get_base_domain, is_internal_link
 from website_checker.crawl.resource import Resource
 from website_checker.crawl.websitepage import WebsitePage
 
@@ -127,3 +127,37 @@ def test_get_base_domain():
     domain = get_base_domain(url)
 
     assert domain == expected_domain
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://local.url",
+        "https://local.url/",
+        "https://local.url/content/image.jpg",
+    ],
+)
+def test_is_internal(url):
+    domain = "https://local.url"
+
+    internal = is_internal_link(url, domain)
+
+    assert internal
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "local.url",
+        "https://local.ur",
+        "https://www.analytics.test/atag/js?id=AS-1234567",
+        "https://local.url.devdomain.url/content/image.jpg",
+        "https://local.urllru",
+    ],
+)
+def test_is_not_internal(url):
+    domain = "https://local.url"
+
+    internal = is_internal_link(url, domain)
+
+    assert not internal
