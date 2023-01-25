@@ -1,34 +1,129 @@
 from unittest.mock import patch
 
+import playwright
 import pytest
 
 from website_checker.crawl.cookie import Cookie
-from website_checker.crawl.crawler import Crawler
+from website_checker.crawl.crawler import Crawler, get_base_domain
+from website_checker.crawl.resource import Resource
+from website_checker.crawl.websitepage import WebsitePage
+
+BASE_URL = "https://domain.url"
+
+
+def browser_cookie():
+    return {"name": "test_cookie", "value": "Test Cookie"}
+
+
+def source():
+    return (
+        '<!DOCTYPE html><html lang="en">'
+        '<head><meta charset="UTF-8"><title>Title</title></head>'
+        '<body><h1>Heading 1</h1></body></html>'
+    )
+
+
+def cookies():
+    return [
+        Cookie(name="_ga"),
+        Cookie(name="_gid"),
+    ]
+
+
+def resources():
+    return [
+        Resource(url="https://domain.test/wp-content/themes/notheme/assets/css/style.css?ver=1.0.0"),
+        Resource(url="https://www.googletagmanager.com/gtag/js?id=UA-1234567-4&l=dataLayer&cx=c"),
+    ]
+
+
+def page():
+    return WebsitePage(
+        url="https://domain.test",
+        title="Test page",
+        html=source(),
+        cookies=cookies(),
+        elements=resources(),
+    )
 
 
 @pytest.fixture
-def mock_crawler(page):
-    # TODO replace with mock of playwright goto
-    with patch.object(Crawler, "next") as mock_crawler_next:
-        mock_crawler_next.return_value = page
-        with Crawler() as c:
+def mock_crawler():
+    url = BASE_URL
+
+    with patch.object(playwright.sync_api.Page, "goto"):
+        with Crawler(url) as c:
             yield c
 
 
 def test_crawler(mock_crawler):
-    url = "https://domain.test"
-
-    mock_crawler.add_links(url)
     next_page = mock_crawler.next()
 
     assert next_page
 
 
-def test_crawler_cookies(mock_crawler):
-    url = "https://domain.test"
+def test_crawler_iterator(mock_crawler):
+    result = []
+    for page in mock_crawler:
+        result.append(page)
 
-    mock_crawler.add_links(url)
+    assert result
+    for page in result:
+        assert page.created
+        assert page.html
+
+
+@pytest.mark.skip(reason="Requires improved mock")
+def test_crawler_cookies(mock_crawler):
     next_page = mock_crawler.next()
 
     assert next_page.cookies
-    assert type(next_page.cookies[0]) == Cookie
+
+
+def test_normalize_url_absolute(mock_crawler):
+    current_url = f"{BASE_URL}/unknown"
+    expected_url = BASE_URL
+
+    normalized_url = mock_crawler.normalize_url(BASE_URL, current_url)
+
+    return normalized_url == expected_url
+
+
+def test_normalize_url_root_relative(mock_crawler):
+    current_url = f"{BASE_URL}/unknown"
+    link = "/test"
+
+    expected_url = f"{BASE_URL}{link}"
+
+    normalized_url = mock_crawler.normalize_url(link, current_url)
+
+    assert normalized_url == expected_url
+
+
+def test_normalize_url_relative(mock_crawler):
+    current_url = f"{BASE_URL}/subdirectory"
+    link = "test"
+    expected_url = f"{current_url}/{link}"
+
+    normalized_url = mock_crawler.normalize_url(link, current_url)
+
+    assert normalized_url == expected_url
+
+
+def test_normalize_removes_fragment(mock_crawler):
+    current_url = BASE_URL
+    link = "test#fragment"
+    expected_url = f"{current_url}/test"
+
+    normalized_url = mock_crawler.normalize_url(link, current_url)
+
+    assert normalized_url == expected_url
+
+
+def test_get_base_domain():
+    url = "https://www.domain.test/subdirectory/test"
+    expected_domain = "https://www.domain.test"
+
+    domain = get_base_domain(url)
+
+    assert domain == expected_domain

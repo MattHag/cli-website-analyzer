@@ -7,13 +7,13 @@ from website_checker.main import WebsiteChecker
 
 
 @pytest.fixture
-def mock_crawler_next(page):
+def mock_crawler_next_once(page):
     with patch.object(Crawler, "next") as mock_next:
-        mock_next.return_value = page
+        mock_next.side_effect = [page]
         yield mock_next
 
 
-def test_main(mock_crawler_next):
+def test_main(mock_crawler_next_once):
     url = "https://domain.test"
     result = WebsiteChecker().check(url)
 
