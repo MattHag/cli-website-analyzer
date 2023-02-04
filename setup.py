@@ -8,6 +8,7 @@ REQUIREMENTS = [
     'types-beautifulsoup4 == 4.*',
     'click == 8.*',
     'jinja2 == 3.*',
+    'loguru == 0.6.*',
     'playwright == 1.*',
 ]
 
