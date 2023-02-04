@@ -6,6 +6,7 @@ with open('README.md', 'r') as fh:
 REQUIREMENTS = [
     'beautifulsoup4 == 4.*',
     'types-beautifulsoup4 == 4.*',
+    'click == 8.*',
     'jinja2 == 3.*',
     'playwright == 1.*',
 ]
