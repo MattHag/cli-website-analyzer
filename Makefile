@@ -3,6 +3,7 @@ VIRTUAL_ENV := venv
 VIRTUAL_BIN := $(VIRTUAL_ENV)/bin
 PROJECT_NAME := website_checker
 TEST_DIR := test
+DOCS_DIR := docs
 
 ## help - Display help about make targets for this Makefile
 help:
@@ -21,6 +22,7 @@ clean:
 	rm -rf $(VIRTUAL_ENV) dist *.egg-info .coverage
 	find . -name '*.pyc' -delete
 	find . -name '*.log' -delete
+	rm -rf $(DOCS_DIR)/_build
 
 ## black - Runs the Black Python formatter against the project
 black:
@@ -63,4 +65,10 @@ mypy:
 test:
 	$(VIRTUAL_BIN)/pytest
 
-.PHONY: help build coverage clean black black-check format format-check install isort isort-check lint mypy test
+## docs - Build the documentation
+docs:
+	$(VIRTUAL_BIN)/sphinx-apidoc -o $(DOCS_DIR)/ $(PROJECT_NAME)
+	$(VIRTUAL_BIN)/sphinx-build -b html $(DOCS_DIR)/ $(DOCS_DIR)/_build
+
+
+.PHONY: help build coverage clean black black-check format format-check install isort isort-check lint mypy test docs
