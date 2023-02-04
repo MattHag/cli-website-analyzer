@@ -1,7 +1,21 @@
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+
 import pytest
 
 from website_checker.analyze.result import AnalyzerResult, PageResult
-from website_checker.report.report import Report
+from website_checker.report import report
+
+
+@pytest.fixture
+def tmp_file(tmp_path):
+    file = NamedTemporaryFile()
+    yield Path(file.name)
+
+
+@pytest.fixture
+def eval_data():
+    return page(results=[CheckResult(), CheckResult()])
 
 
 class CheckResult(AnalyzerResult):
@@ -21,24 +35,15 @@ def page(title="Example", results=None):
     )
 
 
-@pytest.fixture
-def eval_data():
-    return page(results=[CheckResult(), CheckResult()])
+def test_html_report(tmp_file, eval_data):
+    output_file = tmp_file
+    report.HTMLReport().render(eval_data, output_file)
+
+    assert output_file.exists()
 
 
-def test_single_page_report(eval_data):
-    # TODO Use tmpdir
-    report = Report()
+def test_pdf_report(tmp_file, eval_data):
+    output_file = tmp_file
+    report.PDFReport().render(eval_data, output_file)
 
-    result = report.create(eval_data)
-
-    assert result
-
-
-def test_multi_page_report():
-    # TODO Use tmpdir
-    report = Report()
-
-    result = report.create([page(title="Page 1"), page(title="Page 2")])
-
-    assert result
+    assert output_file.exists()
