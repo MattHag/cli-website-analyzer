@@ -16,10 +16,11 @@ build:
 coverage:
 	$(VIRTUAL_BIN)/pytest --cov=$(PROJECT_NAME) --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing
 
-## clean - Remove the virtual environment and clear out .pyc files
+## clean - Remove the virtual environment and clear out .pyc and .log files
 clean:
 	rm -rf $(VIRTUAL_ENV) dist *.egg-info .coverage
 	find . -name '*.pyc' -delete
+	find . -name '*.log' -delete
 
 ## black - Runs the Black Python formatter against the project
 black:
