@@ -5,21 +5,21 @@ from website_checker.crawl.websitepage import WebsitePage
 
 def test_check_external_network_access():
     domain = "https://local.url"
-    resources = [
+    external = [
         Resource(url="https://www.googletagmanager.com/gtag/js?id=UA-1234567"),
-        Resource(url=f"{domain}/blog/hello_world"),
         Resource(url="https://fonts.googleapis.com/css?family=Tangerine"),
+        Resource(url=f"{domain}.testdomain.url/content/image.jpg"),
     ]
-
-    expected_nr_results = len(resources) - 1
+    resources = external + [
+        Resource(url=f"{domain}/content/image.jpg"),
+    ]
     page = WebsitePage(url=domain, elements=resources)
+    expected_external_urls = len(external)
 
     res = CheckExternalNetworkAccess().check(page)
 
     assert "external network access" in res.title.lower()
-    assert len(res.result) == expected_nr_results
-    for resource in res.result:
-        assert not resource.startswith(domain)
+    assert len(res.result) == expected_external_urls
 
 
 def test_check_no_external_network_access():
