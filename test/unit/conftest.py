@@ -1,8 +1,18 @@
 import pytest
+from _pytest.logging import LogCaptureFixture
+from loguru import logger
 
 from website_checker.crawl.cookie import Cookie
 from website_checker.crawl.resource import Resource
 from website_checker.crawl.websitepage import WebsitePage
+
+
+@pytest.fixture
+def caplog(caplog: LogCaptureFixture):
+    """Fixture to capture loguru logs."""
+    handler_id = logger.add(caplog.handler, format="{message}")
+    yield caplog
+    logger.remove(handler_id)
 
 
 @pytest.fixture
