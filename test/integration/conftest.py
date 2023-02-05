@@ -4,15 +4,20 @@ from tempfile import NamedTemporaryFile
 import pytest
 from loguru import logger
 
+from website_checker import default_log
+
 LOG_DIR = Path(__file__).parent.parent.parent / "logs"
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True, scope="session")
 def set_log_file_for_integration_tests():
-    """Set logger output to a file in the test directory."""
-    logger.remove()
+    """Set logger output to a log file for unit tests."""
     log_file = LOG_DIR / "integration_tests.log"
-    logger.add(sink=log_file)
+    default_log.update({"sink": log_file})
+
+    logger.remove()
+    logger.add(**default_log)
+    yield
 
 
 @pytest.fixture

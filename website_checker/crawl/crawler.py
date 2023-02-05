@@ -3,6 +3,7 @@ import urllib
 from typing import List, Set
 from urllib.parse import ParseResult, urldefrag, urljoin, urlparse
 
+from loguru import logger
 from playwright.sync_api import Page, Response, sync_playwright
 
 from website_checker.crawl.cookie import Cookie
@@ -87,6 +88,7 @@ class Crawler(CrawlerBase):
 
     def next(self) -> WebsitePage:
         next_url = self.collected_links.pop()
+        logger.info(f"Visit next: {next_url}")
         return self._next_page(next_url)
 
     def _next_page(self, url: str):
