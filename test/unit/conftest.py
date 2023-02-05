@@ -1,10 +1,26 @@
+from pathlib import Path
+
 import pytest
 from _pytest.logging import LogCaptureFixture
 from loguru import logger
 
+from website_checker import default_log
 from website_checker.crawl.cookie import Cookie
 from website_checker.crawl.resource import Resource
 from website_checker.crawl.websitepage import WebsitePage
+
+LOG_DIR = Path(__file__).parent.parent.parent / "logs"
+
+
+@pytest.fixture(autouse=True, scope="session")
+def set_log_file_for_unit_tests():
+    """Set logger output to a log file for unit tests."""
+    log_file = LOG_DIR / "unit_tests.log"
+    default_log.update({"sink": log_file})
+
+    logger.remove()
+    logger.add(**default_log)
+    yield logger
 
 
 @pytest.fixture
