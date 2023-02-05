@@ -86,7 +86,7 @@ def test_normalize_url_absolute(mock_crawler):
 
     normalized_url = mock_crawler.normalize_url(BASE_URL, current_url)
 
-    return normalized_url == expected_url
+    assert normalized_url == expected_url
 
 
 def test_normalize_url_root_relative(mock_crawler):
