@@ -11,3 +11,4 @@ venv
 build
 output
 _build
+*.log
