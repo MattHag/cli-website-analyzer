@@ -6,6 +6,7 @@ import pytest
 from loguru import logger
 
 from website_checker import main
+from website_checker.analyze.analyzer import Analyzer
 
 DATA = Path(__file__).parent / "data"
 
@@ -38,7 +39,8 @@ def test_integrationtest(start_server, mock_pdf):
     expected_pdf_signature = b"%PDF"
     url = start_server
 
-    pdf_file = main.WebsiteChecker().check(url)
+    analyzer = Analyzer()
+    pdf_file = main.WebsiteChecker(analyzer).check(url)
 
     assert pdf_file == mock_pdf
     assert pdf_file.is_file()

@@ -14,12 +14,12 @@ def test_multiple_h1_headings(page):
 
     result = CheckH1Headings().check(page)
 
-    assert "multiple h1" in result.result.lower()
-    assert expected_result.lower() in result.result.lower()
+    assert "multiple h1" in result.result["text"].lower()
+    assert expected_result.lower() in result.result["text"].lower()
 
 
 def test_no_h1_heading(page):
     page.html = ""
     result = CheckH1Headings().check(page)
 
-    assert "no h1" in result.result.lower()
+    assert "no h1" in result.result["text"].lower()

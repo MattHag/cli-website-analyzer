@@ -2,7 +2,7 @@ import urllib
 from urllib.parse import ParseResult, urlparse
 
 from website_checker.analyze import base_analyzer
-from website_checker.analyze.result import AnalyzerResult
+from website_checker.analyze.result import Status
 
 
 def is_internal_link(url: str, domain: str) -> bool:
@@ -32,15 +32,18 @@ def get_base_domain(url: str) -> str:
 
 class CheckExternalNetworkAccess(base_analyzer.BaseAnalyzer):
     def check(self, page):
+        self.title = "External network access"
+        self.description = "Searches for network access to external servers."
+
         domain = get_base_domain(page.url)
 
-        res = AnalyzerResult(
-            title="External network access",
-            description="Searches for network access to external servers.",
-        )
+        external_resources = []
         for resource in page.elements:
             if not is_internal_link(resource.url, domain):
-                res.add_element(resource.url)
-        if not res.result:
-            res.set_result("Nice, no external network access detected.")
-        return res
+                external_resources.append(resource.url)
+
+        if external_resources:
+            self.save_result(external_resources, Status.WARNING)
+        else:
+            self.save_result("Nice, no external network access detected.", Status.OK)
+        return self

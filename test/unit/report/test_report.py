@@ -3,22 +3,21 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 
-from website_checker.analyze.result import AnalyzerResult, PageResult
+from website_checker.analyze.result import PageContextAdapter, PageEvaluation
 from website_checker.report import report
+
+DEFAULT_HTML_OUTPUT = Path(__file__).parent.parent.parent.parent / "output" / "report.html"
 
 
 @pytest.fixture
 def tmp_file(tmp_path):
-    file = NamedTemporaryFile()
+    file = NamedTemporaryFile(suffix=".html", dir="/tmp")
+    file.name = tmp_path / "test.html"
     yield Path(file.name)
+    file.close()
 
 
-@pytest.fixture
-def eval_data():
-    return page(results=[CheckResult(), CheckResult()])
-
-
-class CheckResult(AnalyzerResult):
+class Result:
     def __init__(self, title="Test Result"):
         self.title = title
         self.description = "This is a test result"
@@ -28,22 +27,60 @@ class CheckResult(AnalyzerResult):
 def page(title="Example", results=None):
     if results is None:
         results = []
-    return PageResult(
+    return PageEvaluation(
         url="https://www.example.com",
         title=title,
         results=results,
     )
 
 
-def test_html_report(tmp_file, eval_data):
+@pytest.fixture
+def eval_pages():
+    return [page(results=[Result().__dict__, Result().__dict__])]
+
+
+@pytest.fixture
+def adapted_context(eval_pages):
+    adapter = PageContextAdapter()
+    return adapter(eval_pages)
+
+
+def test_html_report_jinja(tmp_file, adapted_context):
     output_file = tmp_file
-    report.HTMLReport().render(eval_data, output_file)
+    report.HTMLReport().render(adapted_context, output_file)
 
     assert output_file.exists()
 
 
-def test_pdf_report(tmp_file, eval_data):
+def test_pdf_report_jinja(tmp_file, adapted_context):
     output_file = tmp_file
-    report.PDFReport().render(eval_data, output_file)
+    report.PDFReport().render(adapted_context, output_file)
+
+    assert output_file.exists()
+
+
+def test_adapter(eval_pages):
+    adapter = PageContextAdapter()
+    context = adapter(eval_pages)
+
+    assert len(context["pages"][0].results) == 2
+
+
+def test_html_report_using_adapter(tmp_file, eval_pages):
+    output_file = tmp_file
+
+    adapter = PageContextAdapter()
+    context = adapter(eval_pages)
+    report.HTMLReport().render(context, output_file)
+
+    assert output_file.exists()
+
+
+def test_pdf_report_using_adapter(tmp_file, eval_pages):
+    output_file = tmp_file
+
+    adapter = PageContextAdapter()
+    context = adapter(eval_pages)
+    report.PDFReport().render(context, output_file)
 
     assert output_file.exists()

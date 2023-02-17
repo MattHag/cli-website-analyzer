@@ -1,26 +1,11 @@
 import tempfile
-from datetime import datetime
 from pathlib import Path
-from urllib.parse import urlparse
 
 from website_checker.report import utilities
 
 DEFAULT_TEMPLATE = Path(__file__).parent / "templates" / "base_template.html"
 DEFAULT_PDF_OUTPUT = Path(__file__).parent.parent.parent / "output" / "report.pdf"
 DEFAULT_HTML_OUTPUT = Path(__file__).parent.parent.parent / "output" / "report.html"
-
-
-class PageToContextAdapter:
-    def __call__(self, page_eval) -> dict:
-        """Creates a context for the report."""
-        if type(page_eval) is not list:
-            page_eval = [page_eval]
-
-        return {
-            "title": urlparse(page_eval[0].url).netloc,
-            "creation_date": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
-            "pages": page_eval,
-        }
 
 
 class ReportTemplate:
@@ -34,9 +19,7 @@ class ReportTemplate:
 class HTMLReport(ReportTemplate):
     def render(self, data, path: Path) -> Path:
         """Builds an HTML report from the given data."""
-        adapter = PageToContextAdapter()
-        context = adapter(data)
-        utilities.build_html(self.html_template, context, path)
+        utilities.build_html(self.html_template, data, path)
         return path
 
 
