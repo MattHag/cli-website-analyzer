@@ -1,15 +1,26 @@
-import abc
-from typing import List, Union
+from typing import Any
 
-from website_checker.analyze.result import AnalyzerResult
+from website_checker.analyze.result import Status
 
 
-class BaseAnalyzer(metaclass=abc.ABCMeta):
-    @classmethod
-    @abc.abstractmethod
-    def check(cls, page) -> Union[AnalyzerResult, List[AnalyzerResult]]:
-        """Analyzes one page of a website and returns the results."""
-        ...
+class BaseAnalyzer:
+    def __init__(self):
+        self.title: str = None
+        self.description: str = None
+        self.result: Any = None
+        self.status: str = None
+
+    def check(self, page):
+        """Analyzes one page of a website and sets the results."""
+        raise NotImplementedError
+
+    def save_result(self, data, status: Status):
+        """Sets result as ."""
+        if isinstance(data, list):
+            self.result = {"list": data}
+        else:
+            self.result = {"text": data}
+        self.status = status.value
 
     @classmethod
     def __subclasshook__(cls, C):

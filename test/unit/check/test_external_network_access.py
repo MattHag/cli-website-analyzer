@@ -13,13 +13,13 @@ def test_check_external_network_access():
     resources = external + [
         Resource(url=f"{domain}/content/image.jpg"),
     ]
-    page = WebsitePage(url=domain, elements=resources)
+    page = WebsitePage(url=domain, title="Testsite", elements=resources, html="")
     expected_external_urls = len(external)
 
     res = CheckExternalNetworkAccess().check(page)
 
     assert "external network access" in res.title.lower()
-    assert len(res.result) == expected_external_urls
+    assert len(res.result["list"]) == expected_external_urls
 
 
 def test_check_no_external_network_access():
@@ -28,8 +28,8 @@ def test_check_no_external_network_access():
         Resource(url=f"{domain}/blog/hello_world"),
         Resource(url=f"{domain}/blog/hello_world_2"),
     ]
-    page = WebsitePage(url=domain, elements=resources)
+    page = WebsitePage(url=domain, title="Testsite", elements=resources, html="")
 
     res = CheckExternalNetworkAccess().check(page)
 
-    assert "no external network access" in res.result.lower()
+    assert "no external network access" in res.result["text"].lower()

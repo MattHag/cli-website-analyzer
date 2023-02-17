@@ -1,4 +1,17 @@
-class PageResult:
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List
+
+
+class Status(Enum):
+    OK = "Okay"
+    WARNING = "Warning"
+    FAILED = "Failed"
+
+
+class PageEvaluation:
+    """Represents the analyzer results for a single URL."""
+
     def __init__(self, url: str, title: str, results=None):
         if results is None:
             results = []
@@ -6,42 +19,17 @@ class PageResult:
         self.title = title
         self.results = results
 
-    def add_evaluation(self, evaluation):
+    def add_result(self, evaluation):
         self.results.append(evaluation)
 
 
-class AnalyzerResult:
-    def __init__(self, title: str, description=None):
-        self.title = title
-        self.description = description
-        self.result = None
-
-    def set_result(self, result):
-        """Sets result as text paragraph."""
-        self.result = result
-
-    def add_element(self, element):
-        """Sets result as list of entries."""
-        if self.result is None:
-            self.result = []
-        self.result.append(element)
-
-    def as_dict(self):
-        res = {
-            "title": self.title,
+class PageContextAdapter:
+    def __call__(self, evaluated_pages: List[PageEvaluation]) -> Dict[str, Any]:
+        """Adapts analyzer results to a context for report creation."""
+        evaluated_pages.sort(key=lambda x: x.url)
+        context = {
+            "url": evaluated_pages[0].url,
+            "creation_date": datetime.now().strftime("%d.%m.%Y %H:%M"),
+            "pages": evaluated_pages,
         }
-        if self.description:
-            res["description"] = self.description
-        if type(self.result) == list:
-            res["results"] = self.result
-        else:
-            res["result"] = self.result
-        return res
-
-    @classmethod
-    def __subclasshook__(cls, C):
-        if cls is AnalyzerResult:
-            attrs = set(dir(C))
-            if set(cls.__abstractmethods__) <= attrs:
-                return True
-        return NotImplemented
+        return context

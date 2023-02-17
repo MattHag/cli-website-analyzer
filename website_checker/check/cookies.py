@@ -1,16 +1,19 @@
 from website_checker.analyze.base_analyzer import BaseAnalyzer
-from website_checker.analyze.result import AnalyzerResult
+from website_checker.analyze.result import Status
 
 
 class CheckCookies(BaseAnalyzer):
     def check(self, page):
-        res = AnalyzerResult(
-            title="Cookie without consent",
-            description="The following cookies are set without consent.",
-        )
+        self.title = "Cookie without consent"
+        self.description = "Shows cookies, that are set without consent."
+
+        found_cookies = []
         for cookie in page.cookies:
             # TODO Add additional information for cookies
-            res.add_element(cookie.name)
-        if not res.result:
-            res.set_result("Well done, no cookies set without prior consent.")
-        return res
+            found_cookies.append(cookie.name)
+
+        if found_cookies:
+            self.save_result(found_cookies, Status.WARNING)
+        else:
+            self.save_result("Well done, no cookies set without prior consent.", Status.OK)
+        return self
