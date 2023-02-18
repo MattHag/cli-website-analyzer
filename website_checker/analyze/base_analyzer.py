@@ -1,14 +1,12 @@
-from typing import Any
-
 from website_checker.analyze.result import Status
 
 
 class BaseAnalyzer:
     def __init__(self):
-        self.title: str = None
-        self.description: str = None
-        self.result: Any = None
-        self.status: str = None
+        self.title = None
+        self.description = None  # Text or HTML
+        self.result = None
+        self.status = None
 
     def check(self, page):
         """Analyzes one page of a website and sets the results."""
@@ -17,7 +15,9 @@ class BaseAnalyzer:
     def save_result(self, data, status: Status):
         """Sets result as ."""
         if isinstance(data, list):
-            self.result = {"list": data}
+            self.result = {
+                "list": {"entries": data},
+            }
         else:
             self.result = {"text": data}
         self.status = status.value

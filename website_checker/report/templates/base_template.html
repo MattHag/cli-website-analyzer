@@ -8,10 +8,11 @@
 </head>
 <body>
     {%- include 'frontpage_template.html' -%}
-    <div class="content">
-        {% for page in pages %}
-            {%- include 'section_template.html' -%}
-        {% endfor %}
-    </div>
+    {% for page in pages %}
+        {%- include 'section_template.html' -%}
+    {% endfor %}
+    {% if descriptions %}
+        {%- include 'description_template.html' -%}
+    {% endif %}
 </body>
 </html>
