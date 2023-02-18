@@ -8,6 +8,7 @@ from playwright.sync_api import Page, Response, sync_playwright
 
 from website_checker.crawl.cookie import Cookie
 from website_checker.crawl.crawlerbase import CrawlerBase
+from website_checker.crawl.resource import Resource
 from website_checker.crawl.websitepage import WebsitePage
 
 
@@ -55,6 +56,14 @@ def is_internal_link(url: str, domain: str) -> bool:
     return False
 
 
+def create_resource(response):
+    """Creates a resource object from a response object."""
+    url = response.url
+    headers = response.headers
+    status = response.status
+    return Resource(url, status, headers)
+
+
 class Crawler(CrawlerBase):
     def __init__(self, url: str):
         self.domain = get_base_domain(url)
@@ -96,11 +105,14 @@ class Crawler(CrawlerBase):
         time.sleep(1)
         self._page.goto(url)
         current_url = self._page.url
+        if url != current_url:
+            logger.debug(f"Redirected to: {current_url}")
         self.visited_links.add(current_url)
 
         html = self._page.content()
         temp_cookies = self._page.context.cookies()
         cookies = [Cookie(name=cookie["name"]) for cookie in temp_cookies]
+        elements = [create_resource(response) for response in self._network_requests]
 
         self._collect_links(self._page, current_url)
 
@@ -109,7 +121,7 @@ class Crawler(CrawlerBase):
             title=self._page.title(),
             html=html,
             cookies=cookies,
-            elements=self._network_requests,
+            elements=elements,
         )
 
     def normalize_url(self, link, current_url):
