@@ -3,7 +3,7 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 
-from website_checker.analyze.result import PageContextAdapter, PageEvaluation
+from website_checker.analyze.result import PageContextAdapter, PageEvaluation, Status
 from website_checker.report import report
 
 DEFAULT_HTML_OUTPUT = Path(__file__).parent.parent.parent.parent / "output" / "report.html"
@@ -21,7 +21,8 @@ class Result:
     def __init__(self, title="Test Result"):
         self.title = title
         self.description = "This is a test result"
-        self.result = [{"name": "_ga"}, {"name": "_gid"}]
+        self.result = {"list": {"entries": ["_ga", "_gid"]}}
+        self.status = Status.WARNING.value
 
 
 def page(title="Example", results=None):
@@ -36,7 +37,7 @@ def page(title="Example", results=None):
 
 @pytest.fixture
 def eval_pages():
-    return [page(results=[Result().__dict__, Result().__dict__])]
+    return [page(results=[Result(), Result()])]
 
 
 @pytest.fixture

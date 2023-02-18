@@ -36,7 +36,7 @@ def test_run_analyzer(page):
     "input, expected_result",
     [
         ("This is a result.", {"text": "This is a result."}),
-        (["col1", "col2"], {"list": ["col1", "col2"]}),
+        (["col1", "col2"], {"list": {"entries": ["col1", "col2"]}}),
     ],
 )
 def test_base_analyzer_save_result_text(input, expected_result):

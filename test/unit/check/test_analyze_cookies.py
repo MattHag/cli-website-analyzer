@@ -8,7 +8,7 @@ def test_analyze_cookies(page):
     res = CheckCookies().check(page)
 
     assert "cookie" in res.title.lower()
-    assert res.result["list"] == expected_cookies
+    assert res.result["list"]["entries"] == expected_cookies
     assert res.status == Status.WARNING.value
 
 

@@ -19,7 +19,7 @@ def test_check_external_network_access():
     res = CheckExternalNetworkAccess().check(page)
 
     assert "external network access" in res.title.lower()
-    assert len(res.result["list"]) == expected_external_urls
+    assert len(res.result["list"]["entries"]) == expected_external_urls
 
 
 def test_check_no_external_network_access():

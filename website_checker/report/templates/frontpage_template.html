@@ -1,7 +1,32 @@
 {% block frontpage %}
-<div class="header">
-    <h1>Website checker results</h1>
-    <p class="header__title">{{ title }}</p>
-    <div class="header__date">{{ creation_date }}</div>
-</div>
+<section class="frontpage content-gap">
+    <div class="header">
+        <div>
+            <h1>Website check</h1>
+            <a href="{{ url }}">{{ url }}</a>
+        </div>
+    </div>
+
+    {% if summary %}
+    <div class="card">
+        <div class="card__header card__header--light">
+            <h2 class="card__heading">Summary</h2>
+        </div>
+        <div class="card__body">
+            <div class="table">
+                {%- for entry in summary -%}
+                <div class="table-row">
+                    <p class="table-row__entry">{{ entry.title }}</p>
+                    <span class="badge" data-value="{{ entry.status }}"></span>
+                </div>
+                {%- endfor -%}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <div class="footer__date">{{ creation_date }}</div>
+    </div>
+</section>
 {% endblock %}

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Union
 
 from jinja2 import Environment, FileSystemLoader
+from playwright.async_api import PdfMargins
 from playwright.sync_api import sync_playwright
 
 
@@ -95,10 +96,10 @@ def html_to_pdf(html: Union[bytes, str, Path], path: Union[None, str, Path] = No
             page = browser.new_page()
             with ensure_html_extension_ctx(html) as tmp_html_file:
                 assert tmp_html_file.suffix == ".html"  # Playwright requires .html for rendering
-
                 html_url = f"file://{str(tmp_html_file)}"
                 page.goto(html_url)
-                pdf_bytes = page.pdf(format="A4", path=path)
+                margin: PdfMargins = {"top": "2cm", "bottom": "2cm", "left": "2cm", "right": "2cm"}
+                pdf_bytes = page.pdf(path=path, format="A4", margin=margin)
             return pdf_bytes
         finally:
             browser.close()
