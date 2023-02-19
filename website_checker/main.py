@@ -11,10 +11,11 @@ PDF_OUTPUT = Path(__file__).parent.parent / "output" / "report.pdf"
 
 
 class WebsiteChecker:
-    def __init__(self, analyzer=None):
+    def __init__(self, analyzer=None, *, max_pages=None):
         if analyzer is None:
             analyzer = Analyzer()
         self.analyzer = analyzer
+        self.max_pages = max_pages
 
     def check(self, url) -> Path:
         crawled_pages = self.crawl(url)
@@ -24,8 +25,10 @@ class WebsiteChecker:
     def crawl(self, url) -> List[WebsitePage]:
         pages = []
         with Crawler(url) as crawler:
-            for page in crawler:
+            for idx, page in enumerate(crawler, start=1):
                 pages.append(page)
+                if self.max_pages and idx >= self.max_pages:
+                    break
         return pages
 
     def evaluate(self, pages: List[WebsitePage]) -> List[PageEvaluation]:
