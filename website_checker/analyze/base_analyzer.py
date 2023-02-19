@@ -18,7 +18,16 @@ class BaseAnalyzer:
             self.result = {
                 "list": {"entries": data},
             }
-        else:
+        if isinstance(data, dict):
+            if "heading" in data:
+                self.result = {
+                    "table": {"heading": data["heading"], "entries": data["entries"]},
+                }
+            else:
+                self.result = {
+                    "table": {"entries": data["entries"]},
+                }
+        if type(data) == str:
             self.result = {"text": data}
         self.status = status.value
 

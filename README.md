@@ -23,6 +23,18 @@ pip3 install website_checker
 make install
 ```
 
+## Update cookie database
+
+The update scripts loads the newest Cookie data CSV file (from https://github.com/jkwakman/Open-Cookie-Database) and
+checks its compatibility. If the new file is compatible, it will be used as the new database.
+
+```bash
+make update
+```
+
+Manually replacing is also possible. Just replace the file _open-cookie-database.csv_ with the new one. However, that
+might cause a failure if the new file is not compatible.
+
 ## Usage
 
 Usage instructions go here.

@@ -9,6 +9,8 @@ REQUIREMENTS = [
     'click == 8.*',
     'jinja2 == 3.*',
     'loguru == 0.6.*',
+    'pandas == 1.*',
+    'pandas-stubs == 1.*',
     'playwright == 1.*',
 ]
 
@@ -17,7 +19,7 @@ DEV_REQUIREMENTS = [
     'build == 0.7.*',
     'flake8 == 4.*',
     'isort == 5.*',
-    'mypy == 0.942',
+    'mypy == 1.*',
     'pre-commit == 2.20.*',
     'pytest == 7.*',
     'pytest-cov == 4.*',

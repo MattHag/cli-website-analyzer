@@ -70,5 +70,8 @@ docs:
 	$(VIRTUAL_BIN)/sphinx-apidoc -o $(DOCS_DIR)/ $(PROJECT_NAME)
 	$(VIRTUAL_BIN)/sphinx-build -b html $(DOCS_DIR)/ $(DOCS_DIR)/_build
 
+## update - Update data e.g. Cookie database
+update:
+	cd $(PROJECT_NAME)/check/cookies_data/ && $(PYTHON_BINARY) cookie_database.py
 
-.PHONY: help build coverage clean black black-check format format-check install isort isort-check lint mypy test docs
+.PHONY: help build coverage clean black black-check format format-check install isort isort-check lint mypy test docs update
