@@ -14,21 +14,29 @@ class BaseAnalyzer:
 
     def save_result(self, data, status: Status):
         """Sets result as ."""
+        if self.result is None:
+            self.result = {}
         if isinstance(data, list):
-            self.result = {
-                "list": {"entries": data},
-            }
+            self.result.update(
+                {
+                    "list": {"entries": data},
+                }
+            )
         if isinstance(data, dict):
             if "heading" in data:
-                self.result = {
-                    "table": {"heading": data["heading"], "entries": data["entries"]},
-                }
+                self.result.update(
+                    {
+                        "table": {"heading": data["heading"], "entries": data["entries"]},
+                    }
+                )
             else:
-                self.result = {
-                    "table": {"entries": data["entries"]},
-                }
+                self.result.update(
+                    {
+                        "table": {"entries": data["entries"]},
+                    }
+                )
         if type(data) == str:
-            self.result = {"text": data}
+            self.result.update({"text": data})
         self.status = status.value
 
     @classmethod
