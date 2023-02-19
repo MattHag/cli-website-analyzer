@@ -47,6 +47,10 @@ section {
     display: block;
     page-break-before: always;
   }
+
+  .card {
+    page-break-inside: avoid;
+  }
 }
 
 body {
