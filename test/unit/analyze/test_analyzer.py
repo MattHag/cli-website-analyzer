@@ -37,6 +37,29 @@ def test_run_analyzer(page):
     [
         ("This is a result.", {"text": "This is a result."}),
         (["col1", "col2"], {"list": {"entries": ["col1", "col2"]}}),
+        (
+            {"entries": [["col11", "col21"], ["col12", "col22"]]},
+            {
+                "table": {
+                    "entries": [
+                        ["col11", "col21"],
+                        ["col12", "col22"],
+                    ],
+                },
+            },
+        ),
+        (
+            {"heading": ["h1", "h2"], "entries": [["col11", "col21"], ["col12", "col22"]]},
+            {
+                "table": {
+                    "heading": ["h1", "h2"],
+                    "entries": [
+                        ["col11", "col21"],
+                        ["col12", "col22"],
+                    ],
+                },
+            },
+        ),
     ],
 )
 def test_base_analyzer_save_result_text(input, expected_result):
