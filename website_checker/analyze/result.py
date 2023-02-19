@@ -35,6 +35,7 @@ class PageContextAdapter:
         for page in evaluated_pages:
             for result in page.results:
                 result.status = Status(result.status).name.lower()
+            page.results.sort(key=lambda x: x.title)
 
         context = {
             "url": evaluated_pages[0].url,
