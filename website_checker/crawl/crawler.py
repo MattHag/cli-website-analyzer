@@ -158,7 +158,9 @@ class Crawler(CrawlerBase):
 
     def _collect_links(self, page: Page, current_url: str):
         """Extracts all <a href=""> links from the page."""
-        link_elements = page.query_selector_all("a[href]")
+        css_selector = "a[href]:not([rel*='nofollow'])"
+        link_elements = page.query_selector_all(css_selector)
+
         links = {link.get_attribute("href") for link in link_elements}
         links = {self.normalize_url(link, current_url) for link in links}
 
