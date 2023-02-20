@@ -112,6 +112,7 @@ class Crawler(CrawlerBase):
         self._network_requests = []  # reset
         self._page.context.clear_cookies()
         time.sleep(1)
+        self.visited_links.add(url)
         self._page.goto(url)
         current_url = self._page.url
         if url != current_url:
