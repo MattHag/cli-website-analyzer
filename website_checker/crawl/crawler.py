@@ -110,6 +110,7 @@ class Crawler(CrawlerBase):
 
     def _next_page(self, url: str):
         self._network_requests = []  # reset
+        self._page.context.clear_cookies()
         time.sleep(1)
         self._page.goto(url)
         current_url = self._page.url
