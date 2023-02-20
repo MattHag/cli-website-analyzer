@@ -23,7 +23,15 @@
     </div>
     {% endif %}
 
-    <div class="footer">
+    <div class="footer content-gap">
+        <div>
+            {% if pages | length == 1 %}
+            <p>1 page analyzed.</p>
+            {% else %}
+            <p>{{ pages | length }} pages analyzed.</p>
+            {% endif %}
+        </div>
+
         <div class="footer__date">{{ creation_date }}</div>
     </div>
 </section>

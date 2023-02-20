@@ -64,6 +64,11 @@ def create_resource(response):
     return Resource(url, status, headers)
 
 
+class ExternalLinkException(Exception):
+    def __init__(self, url):
+        self.url = url
+
+
 class Crawler(CrawlerBase):
     def __init__(self, url: str):
         self.domain = get_base_domain(url)
@@ -98,7 +103,10 @@ class Crawler(CrawlerBase):
     def next(self) -> WebsitePage:
         next_url = self.collected_links.pop()
         logger.info(f"Visit next: {next_url}")
-        return self._next_page(next_url)
+        try:
+            return self._next_page(next_url)
+        except ExternalLinkException:
+            return self.next()
 
     def _next_page(self, url: str):
         self._network_requests = []  # reset
@@ -107,6 +115,9 @@ class Crawler(CrawlerBase):
         current_url = self._page.url
         if url != current_url:
             logger.debug(f"Redirected to: {current_url}")
+            if not is_internal_link(current_url, self.domain):
+                logger.debug(f"Skip external page: {current_url}")
+                raise ExternalLinkException(current_url)
         self.visited_links.add(current_url)
 
         html = self._page.content()
@@ -147,7 +158,9 @@ class Crawler(CrawlerBase):
 
     def _collect_links(self, page: Page, current_url: str):
         """Extracts all <a href=""> links from the page."""
-        link_elements = page.query_selector_all("a[href]")
+        css_selector = "a[href]:not([rel*='nofollow'])"
+        link_elements = page.query_selector_all(css_selector)
+
         links = {link.get_attribute("href") for link in link_elements}
         links = {self.normalize_url(link, current_url) for link in links}
 
