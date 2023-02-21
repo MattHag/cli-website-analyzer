@@ -8,6 +8,9 @@ class CheckResourceLoadErrors(base_analyzer.BaseAnalyzer):
         self.description = "Searches for resources that do not load."
 
         invalid_access = []
+        for resource in page.failed_requests:
+            if resource.failure:
+                invalid_access.append(f"{resource.url}, {resource.failure}")
         for resource in page.elements:
             if resource.status_code and (400 <= resource.status_code <= 499):
                 invalid_access.append(f"{resource.url}, {resource.status_code}")
