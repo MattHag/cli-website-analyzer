@@ -69,6 +69,11 @@ class ExternalLinkException(Exception):
         self.url = url
 
 
+class NopageException(Exception):
+    def __init__(self, url):
+        self.url = url
+
+
 class Crawler(CrawlerBase):
     def __init__(self, url: str):
         self.domain = get_base_domain(url)
@@ -81,6 +86,7 @@ class Crawler(CrawlerBase):
         self._browser = self._p.chromium.launch(headless=True)
         self._page = self._browser.new_page()
         self._page.on("response", self._response_hook)
+        self._page.on("download", self._download_hook)
 
         self._add_url(url)  # add start url
 
@@ -105,7 +111,8 @@ class Crawler(CrawlerBase):
         logger.info(f"Visit next: {next_url}")
         try:
             return self._next_page(next_url)
-        except ExternalLinkException:
+        except Exception as e:
+            logger.error(f"Error while crawling: {e}")
             return self.next()
 
     def _next_page(self, url: str):
@@ -179,3 +186,9 @@ class Crawler(CrawlerBase):
 
     def _response_hook(self, response: Response):
         self._network_requests.append(response)
+
+    def _download_hook(self, download):
+        logger.debug(f"Download appeared: {download.url}")
+        if not self._network_requests:
+            download.cancel()
+            raise NopageException(download.url)
