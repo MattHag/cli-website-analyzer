@@ -4,11 +4,11 @@ from typing import List, Set
 from urllib.parse import ParseResult, urldefrag, urljoin, urlparse
 
 from loguru import logger
-from playwright.sync_api import Page, Response, sync_playwright
+from playwright.sync_api import Page, Request, Response, sync_playwright
 
 from website_checker.crawl.cookie import Cookie
 from website_checker.crawl.crawlerbase import CrawlerBase
-from website_checker.crawl.resource import Resource
+from website_checker.crawl.resource import Resource, ResourceRequest
 from website_checker.crawl.websitepage import WebsitePage
 
 
@@ -80,12 +80,16 @@ class Crawler(CrawlerBase):
         self.collected_links: Set = set()
         self.visited_links: Set = set()
 
-        self._network_requests: List = []
+        self.responses: List = []
+        self.requests: List = []
+        self.failed_requests: List = []
 
         self._p = sync_playwright().start()
         self._browser = self._p.chromium.launch(headless=True)
         self._page = self._browser.new_page()
+        self._page.on("requestfailed", self._requestfailed_hook)
         self._page.on("response", self._response_hook)
+        self._page.on("requestfinished", self._requestfinished)
         self._page.on("download", self._download_hook)
 
         self._add_url(url)  # add start url
@@ -115,8 +119,13 @@ class Crawler(CrawlerBase):
             logger.error(f"Error while crawling: {e}")
             return self.next()
 
+    def _reset_data(self):
+        self.responses = []
+        self.requests = []
+        self.failed_requests = []
+
     def _next_page(self, url: str):
-        self._network_requests = []  # reset
+        self._reset_data()
         self._page.context.clear_cookies()
         time.sleep(1)
         self.visited_links.add(url)
@@ -132,7 +141,9 @@ class Crawler(CrawlerBase):
         html = self._page.content()
         temp_cookies = self._page.context.cookies()
         cookies = [Cookie(name=cookie["name"]) for cookie in temp_cookies]
-        elements = [create_resource(response) for response in self._network_requests]
+        elements = [create_resource(response) for response in self.responses]
+        requests = [ResourceRequest(url=req.url, sizes=req.sizes()) for req in self.requests if not req.failure]
+        failed_requests = [ResourceRequest(url=req.url, failure=req.failure) for req in self.failed_requests]
 
         self._collect_links(self._page, current_url)
 
@@ -142,6 +153,8 @@ class Crawler(CrawlerBase):
             html=html,
             cookies=cookies,
             elements=elements,
+            requests=requests,
+            failed_requests=failed_requests,
         )
 
     def normalize_url(self, link, current_url):
@@ -184,11 +197,18 @@ class Crawler(CrawlerBase):
         for link in unvisited_internal_pages:
             self._add_url(link)
 
+    def _requestfailed_hook(self, request: Request):
+        logger.debug(f"Request failed for: {request.url}")
+        self.failed_requests.append(request)
+
     def _response_hook(self, response: Response):
-        self._network_requests.append(response)
+        self.responses.append(response)
+
+    def _requestfinished(self, request: Request):
+        self.requests.append(request)
 
     def _download_hook(self, download):
         logger.debug(f"Download appeared: {download.url}")
-        if not self._network_requests:
+        if not self.responses:
             download.cancel()
             raise NopageException(download.url)
