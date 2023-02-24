@@ -18,6 +18,11 @@ COOKIE_CSV_EXAMPLE = [
         " hour,Google,https://privacy.google.com/take-control.html,1"
     ),
     (
+        "d7496a0e-7f4b-4e20-b288-9d5e4852fa79,Google Analytics,Analytics,_gat_,google-analytics.com (3rd party) or "
+        "advertiser's website domain (1st party),ID used to identify users,2 years,Google,"
+        "https://privacy.google.com/take-control.html,1"
+    ),
+    (
         "256c1550-d881-11e9-8a34-2a2ae2dbcce4,Cookiebot,Functional,userlang,cookiebot.com (3rd party),Saves language"
         " preferences of user for a website,1 year,Cookiebot,https://www.cookiebot.com/en/cookie-declaration/,1"
     ),
@@ -48,9 +53,42 @@ def test_load_cookie_database(database_csv):
 
 
 def test_search_cookie_database(database_csv):
-    cookie_name = "_gat_gtag_"
+    cookie_name = "CookieConsentBulkTicket"
     with cookie_database.CookieDatabase(database_csv) as cookie_db:
         res = cookie_db.search(cookie_name)
 
     assert type(res) == dict
     assert res["cookie_name"] == cookie_name
+    assert res["platform"] == "Cookiebot"
+    assert res["category"] == "Functional"
+
+
+def test_search_invalid(database_csv):
+    cookie_name = "invalid_name"
+    with cookie_database.CookieDatabase(database_csv) as cookie_db:
+        with pytest.raises(KeyError):
+            cookie_db.search(cookie_name)
+
+
+@pytest.mark.parametrize(
+    "cookie_name,identifier",
+    [
+        ("_gat_gtag_UA_1234567_1", "2caa7a78-e93f-49ca-8fe6-1aaafae1efaa"),
+        ("_gat_1234", "d7496a0e-7f4b-4e20-b288-9d5e4852fa79"),
+    ],
+)
+def test_search_with_wildcard(cookie_name, identifier, database_csv):
+    with cookie_database.CookieDatabase(database_csv) as cookie_db:
+        res = cookie_db.search(cookie_name)
+
+    assert type(res) == dict
+    assert res["cookie_name"] == cookie_name
+    assert res["id"] == identifier
+    assert res["platform"] == "Google Analytics"
+
+
+def test_search_invalid_exact_wildcard_match(database_csv):
+    cookie_name = "_gat_"
+    with cookie_database.CookieDatabase(database_csv) as cookie_db:
+        with pytest.raises(KeyError):
+            cookie_db.search(cookie_name)
