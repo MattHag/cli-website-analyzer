@@ -3,8 +3,10 @@ from loguru import logger
 
 from website_checker.main import WebsiteChecker
 
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
-@click.command()
+
+@click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument("url")
 @click.option("-p", "--max-pages", type=int, help="Crawl a maximum of n pages")
 def main(url, max_pages):

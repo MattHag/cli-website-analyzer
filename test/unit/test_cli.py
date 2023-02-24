@@ -47,3 +47,7 @@ def test_cli_help():
 
     assert result.exit_code == 0
     assert "Show this message and exit." in result.output
+
+    result = runner.invoke(main, ['-h'])
+
+    assert result.exit_code == 0
