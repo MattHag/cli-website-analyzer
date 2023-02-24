@@ -1,10 +1,10 @@
 import time
 import urllib
-from typing import List, Set
+from typing import List, Set, Union
 from urllib.parse import ParseResult, urldefrag, urljoin, urlparse
 
 from loguru import logger
-from playwright.sync_api import Page, Request, Response, sync_playwright
+from playwright.sync_api import BrowserContext, Page, Request, Response, sync_playwright
 
 from website_checker.crawl.cookie import Cookie
 from website_checker.crawl.crawlerbase import CrawlerBase
@@ -86,11 +86,7 @@ class Crawler(CrawlerBase):
 
         self._p = sync_playwright().start()
         self._browser = self._p.chromium.launch(headless=True)
-        self._page = self._browser.new_page()
-        self._page.on("requestfailed", self._requestfailed_hook)
-        self._page.on("response", self._response_hook)
-        self._page.on("requestfinished", self._requestfinished)
-        self._page.on("download", self._download_hook)
+        self.context: Union[None, BrowserContext] = None
 
         self._add_url(url)  # add start url
 
@@ -124,32 +120,44 @@ class Crawler(CrawlerBase):
         self.requests = []
         self.failed_requests = []
 
+    def _register_hooks(self, page: Page):
+        page.on("requestfailed", self._requestfailed_hook)
+        page.on("response", self._response_hook)
+        page.on("requestfinished", self._requestfinished_hook)
+        page.on("download", self._download_hook)
+
     def _next_page(self, url: str):
         self._reset_data()
-        self._page.context.clear_cookies()
-        time.sleep(1)
-        self.visited_links.add(url)
-        self._page.goto(url)
-        current_url = self._page.url
-        if url != current_url:
-            logger.debug(f"Redirected to: {current_url}")
-            if not is_internal_link(current_url, self.domain):
-                logger.debug(f"Skip external page: {current_url}")
-                raise ExternalLinkException(current_url)
-        self.visited_links.add(current_url)
+        self.context = self._browser.new_context()  # incognito mode
+        try:
+            page = self.context.new_page()
+            self._register_hooks(page)
+            time.sleep(1)
+            self.visited_links.add(url)
+            page.goto(url)
+            current_url = page.url
+            if url != current_url:
+                logger.debug(f"Redirected to: {current_url}")
+                if not is_internal_link(current_url, self.domain):
+                    logger.debug(f"Skip external page: {current_url}")
+                    raise ExternalLinkException(current_url)
+            self.visited_links.add(current_url)
 
-        html = self._page.content()
-        temp_cookies = self._page.context.cookies()
-        cookies = [Cookie(name=cookie["name"]) for cookie in temp_cookies]
-        elements = [create_resource(response) for response in self.responses]
-        requests = [ResourceRequest(url=req.url, sizes=req.sizes()) for req in self.requests if not req.failure]
-        failed_requests = [ResourceRequest(url=req.url, failure=req.failure) for req in self.failed_requests]
+            html = page.content()
+            title = page.title()
+            temp_cookies = page.context.cookies()
+            cookies = [Cookie(name=cookie["name"]) for cookie in temp_cookies]
+            elements = [create_resource(response) for response in self.responses]
+            requests = [ResourceRequest(url=req.url, sizes=req.sizes()) for req in self.requests if not req.failure]
+            failed_requests = [ResourceRequest(url=req.url, failure=req.failure) for req in self.failed_requests]
 
-        self._collect_links(self._page, current_url)
+            self._collect_links(page, current_url)
+        finally:
+            self.context.close()
 
         return WebsitePage(
             url=current_url,
-            title=self._page.title(),
+            title=title,
             html=html,
             cookies=cookies,
             elements=elements,
@@ -204,7 +212,7 @@ class Crawler(CrawlerBase):
     def _response_hook(self, response: Response):
         self.responses.append(response)
 
-    def _requestfinished(self, request: Request):
+    def _requestfinished_hook(self, request: Request):
         self.requests.append(request)
 
     def _download_hook(self, download):
