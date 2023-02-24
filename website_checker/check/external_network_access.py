@@ -38,12 +38,15 @@ class CheckExternalNetworkAccess(base_analyzer.BaseAnalyzer):
         domain = get_base_domain(page.url)
 
         external_resources = []
+        for resource in page.failed_requests:
+            if not is_internal_link(resource.url, domain):
+                external_resources.append(f"{resource.url}")
         for resource in page.elements:
             if not is_internal_link(resource.url, domain):
                 external_resources.append(resource.url)
 
         if external_resources:
-            self.save_result(external_resources, Status.WARNING)
+            self.save_result(sorted(external_resources), Status.WARNING)
         else:
             self.save_result("Nice, no external network access detected.", Status.OK)
         return self

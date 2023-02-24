@@ -22,7 +22,7 @@ class Result:
         self.title = title
         self.description = "This is a test result"
         self.result = {"list": {"entries": ["_ga", "_gid"]}}
-        self.status = Status.WARNING.value
+        self.status = Status.WARNING
 
 
 def page(title="Example", results=None):

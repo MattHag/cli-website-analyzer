@@ -37,7 +37,12 @@ class BaseAnalyzer:
                 )
         if type(data) == str:
             self.result.update({"text": data})
-        self.status = status.value
+
+        # set status to the worst status
+        if self.status is None:
+            self.status = status
+        elif status.value > self.status.value:
+            self.status = status
 
     @classmethod
     def __subclasshook__(cls, C):
