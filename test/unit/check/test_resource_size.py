@@ -20,5 +20,5 @@ def test_check(size_kb, expected_status, page):
     res = CheckResourceSize().check(page)
 
     assert "big resources" in res.title.lower()
-    assert res.status == expected_status.value
+    assert res.status == expected_status
     assert "load time" in res.description

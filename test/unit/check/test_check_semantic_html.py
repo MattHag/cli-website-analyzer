@@ -12,7 +12,7 @@ def test_check_semantic_html(page):
     assert "semantic html" in res.title.lower()
     assert "checks usage of structural semantic" in res.description.lower()
 
-    assert res.status == Status.OK.value
+    assert res.status == Status.OK
     assert "structural semantic tags are used" in res.result["text"].lower()
     assert expected in res.result["text"].lower()
 
@@ -21,5 +21,5 @@ def test_check_no_semantic_html(page):
     page.html = ""
     res = CheckSemanticHtml().check(page)
 
-    assert res.status == Status.WARNING.value
+    assert res.status == Status.WARNING
     assert "no structural semantic tags" in res.result["text"].lower()

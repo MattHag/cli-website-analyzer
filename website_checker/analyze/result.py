@@ -60,9 +60,10 @@ class PageContextAdapter:
             for result in page.results:
                 entry = test_summary.get(
                     result.title,
-                    {"title": result.title, "status": result.status},
+                    {"title": result.title, "status": result.status.value},
                 )
-                if result.status > entry["status"]:
-                    entry["status"] = result.status
+                result_value = result.status.value
+                if result_value > entry["status"]:
+                    entry["status"] = result_value
                 test_summary[result.title] = entry
         return sorted(test_summary.values(), key=lambda x: x["title"])

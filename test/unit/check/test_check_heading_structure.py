@@ -29,7 +29,7 @@ def test_single_h1_heading(page):
     res = CheckHeadingStructure().check(page)
 
     assert "heading structure" in res.title.lower()
-    assert res.status == Status.OK.value
+    assert res.status == Status.OK
     assert res.result["text"]
 
 
@@ -39,7 +39,7 @@ def test_multiple_h1_headings(page):
 
     res = CheckHeadingStructure().check(page)
 
-    assert res.status == Status.WARNING.value
+    assert res.status == Status.WARNING
     assert len(res.result["list"]["entries"]) == 2
 
 
@@ -48,7 +48,7 @@ def test_complex_tree(page):
 
     res = CheckHeadingStructure().check(page)
 
-    assert res.status == Status.OK.value
+    assert res.status == Status.OK
     assert res.result["text"]
 
 
@@ -56,7 +56,7 @@ def test_missing_h1(page):
     page.html = ""
     res = CheckHeadingStructure().check(page)
 
-    assert res.status == Status.WARNING.value
+    assert res.status == Status.WARNING
     assert "no heading" in res.result["text"].lower()
 
 
@@ -64,6 +64,6 @@ def test_invalid_h2_before_h1(page):
     page.html = "<h2>First heading</h2><h1>Second heading</h1>"
     res = CheckHeadingStructure().check(page)
 
-    assert res.status == Status.WARNING.value
+    assert res.status == Status.WARNING
     assert "expected one of h1" in res.result["text"].lower()
     assert len(res.result["list"]["entries"]) == 1

@@ -17,7 +17,7 @@ def test_check_cookies(cookie_names, expected_status, page):
 
     res = CheckCookies().check(page)
 
-    assert res.status == expected_status.value
+    assert res.status == expected_status
     assert res.title == "Cookies without consent"
     assert res.description
 

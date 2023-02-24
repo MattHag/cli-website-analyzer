@@ -17,11 +17,11 @@ def test_check_400_status_errors(status_code, expected_status, page):
 
     res = CheckResourceLoadErrors().check(page)
 
-    assert res.status == expected_status.value
+    assert res.status == expected_status
     assert "resource load errors" in res.title.lower()
     assert "do not load" in res.description
 
-    if res.status == Status.OK.value:
+    if res.status == Status.OK:
         assert "nice" in res.result["text"].lower()
     else:
         assert len(res.result["list"]["entries"]) == 1
