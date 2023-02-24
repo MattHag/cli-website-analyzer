@@ -39,7 +39,26 @@ class CookieDatabase:
         return unique_cookies.to_dict(orient="index")
 
     def search(self, cookie_name):
-        return self.data.get(cookie_name)
+        cookie_details = self.data.get(cookie_name, None)
+
+        found_name = ""
+        if cookie_details and int(cookie_details["wildcard_match"]):
+            found_name = cookie_details["cookie_name"]
+
+        if cookie_details is None or cookie_details["wildcard_match"]:
+            part_name = found_name
+            for name, details in self.data.items():
+                if details["wildcard_match"] and cookie_name.startswith(name):
+                    if len(found_name) < len(name):
+                        found_name = name
+
+            if not found_name or found_name == part_name:
+                raise KeyError(f"Could not find details for cookie '{cookie_name}' in database.")
+
+            cookie_details = self.data[found_name]
+            cookie_details["cookie_name"] = cookie_name
+
+        return cookie_details
 
     def __enter__(self):
         self.data = {}

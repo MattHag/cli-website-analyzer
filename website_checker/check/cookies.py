@@ -8,21 +8,21 @@ class CheckCookies(BaseAnalyzer):
         self.title = "Cookies without consent"
         self.description = "Finds cookies, that are stored without user consent."
 
-        allowed_keys = {
+        sorted_keys = (
             "cookie_name",
             "platform",
             "retention_period",
             "category",
-        }
+        )
         cookies = []
         with CookieDatabase() as cookie_db:
             for cookie in page.cookies:
-                result = cookie_db.search(cookie.name)
-                if result:
-                    cookie_details = {key: result[key] for key in result if key in allowed_keys}
-                    cookies.append(cookie_details)
-                else:
-                    cookies.append({"cookie_name": cookie.name})
+                try:
+                    result = cookie_db.search(cookie.name)
+                except KeyError:
+                    result = {"cookie_name": cookie.name}
+                cookie_details = {key: result[key] for key in sorted_keys if key in result}
+                cookies.append(cookie_details)
             if cookies:
                 headings = [heading.replace("_", " ").capitalize() for heading in cookies[0].keys()]
                 cookies = [list(cookie.values()) for cookie in cookies]

@@ -8,7 +8,7 @@ from website_checker.crawl.cookie import Cookie
 @pytest.mark.parametrize(
     "cookie_names, expected_status",
     [
-        # (["_gtag", "cookie_123"], Status.WARNING),  # Needs CookieDatabase mock
+        (["CookieConsentBulkTicket"], Status.WARNING),
         ([], Status.OK),
     ],
 )
@@ -25,3 +25,11 @@ def test_check_cookies(cookie_names, expected_status, page):
         assert res.result["text"]
     else:
         assert len(res.result["table"]["entries"]) == len(cookie_names)
+
+
+def test_check_unknown_cookie(page):
+    page.cookies = [Cookie("unknown")]
+
+    res = CheckCookies().check(page)
+
+    assert res.status == Status.WARNING
