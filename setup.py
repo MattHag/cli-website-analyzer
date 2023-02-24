@@ -59,7 +59,7 @@ setuptools.setup(
     },
     entry_points={
         'console_scripts': [
-            'gdpr-website-checker-cli=website_checker.my_module:main',
+            'website-analyzer=website_checker.cli:main',
         ]
     },
     python_requires='>=3.7, <4',
