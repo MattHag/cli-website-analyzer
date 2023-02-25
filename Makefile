@@ -43,6 +43,9 @@ install:
 	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
 	$(VIRTUAL_BIN)/pip install -e ."[dev]"
 	$(VIRTUAL_BIN)/python -m playwright install chromium
+
+## install-pre-commit - Install pre-commit hooks for development
+install-pre-commit:
 	$(VIRTUAL_BIN)/pre-commit install
 
 ## isort - Sorts imports throughout the project
@@ -74,4 +77,4 @@ docs:
 update:
 	cd $(PROJECT_NAME)/check/cookies_data/ && $(PYTHON_BINARY) cookie_database.py
 
-.PHONY: help build coverage clean black black-check format format-check install isort isort-check lint mypy test docs update
+.PHONY: help build coverage clean black black-check format format-check install install-pre-commit isort isort-check lint mypy test docs update
