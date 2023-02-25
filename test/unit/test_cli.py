@@ -33,6 +33,16 @@ def test_cli_max_pages(mock_website_check):
     assert result.exit_code == 0
 
 
+def test_cli_save(mock_website_check):
+    runner = CliRunner()
+
+    result = runner.invoke(main, ['domain.url', '--save'])
+    assert result.exit_code == 0
+
+    result = runner.invoke(main, ['domain.url', '-s'])
+    assert result.exit_code == 0
+
+
 def test_cli_invalid():
     runner = CliRunner()
     result = runner.invoke(main)
