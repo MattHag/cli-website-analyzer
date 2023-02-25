@@ -90,6 +90,7 @@ Usage: website-analyzer [OPTIONS] URL
 
 Options:
   -p, --max-pages INTEGER  Crawl a maximum of n pages
+  -s, --save               Save the report to a file
   -h, --help               Show this message and exit.
 
 ```
