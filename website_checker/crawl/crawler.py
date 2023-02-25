@@ -134,7 +134,7 @@ class Crawler(CrawlerBase):
             self._register_hooks(page)
             time.sleep(1)
             self.visited_links.add(url)
-            page.goto(url)
+            page.goto(url, wait_until="networkidle")
             current_url = page.url
             if url != current_url:
                 logger.debug(f"Redirected to: {current_url}")
