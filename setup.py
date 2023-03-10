@@ -12,6 +12,7 @@ REQUIREMENTS = [
     'pandas == 1.*',
     'pandas-stubs == 1.*',
     'playwright == 1.*',
+    'setuptools == 58.*',
 ]
 
 DEV_REQUIREMENTS = [
@@ -29,12 +30,11 @@ DEV_REQUIREMENTS = [
 ]
 
 setuptools.setup(
-    name='gdpr-website-checker-cli',
+    name='cli-website-checker',
     version='0.1.0',
     description='Checks loading of external resources and cookies without consent',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='http://github.com/MattHag/gdpr-website-checker-cli',
     author='Matthias Hagmann',
     license='MIT',
     packages=setuptools.find_packages(

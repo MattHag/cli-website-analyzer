@@ -55,7 +55,7 @@ In the end a description of each conducted check is attached.
 ## Install
 
 Clone the repository or download the ZIP file.
-Then install the CLI Websit analyzer.
+Then install the CLI Website analyzer.
 
 ```bash
 make install
@@ -64,7 +64,7 @@ make install
 
 ## Usage
 
-Crawl and analyze your complete website and create a PDF report.
+Crawl and analyze a whole website and create a PDF report with all its findings.
 
 ```bash
 website-analyzer <yourdomain>
@@ -95,7 +95,7 @@ Options:
 
 ```
 
-### Update data sources
+## Update data sources
 
 An update script loads the newest cookie database from https://github.com/jkwakman/Open-Cookie-Database, checks its
 compatibility and replaces the existing database.

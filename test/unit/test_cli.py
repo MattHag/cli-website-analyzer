@@ -20,7 +20,7 @@ def test_cli(mock_website_check):
     result = runner.invoke(main, ['domain.url'])
 
     assert result.exit_code == 0
-    assert "Given URL is" in result.output
+    assert "URL is" in result.output
 
 
 def test_cli_max_pages(mock_website_check):

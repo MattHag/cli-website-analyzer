@@ -9,7 +9,7 @@ from website_checker.crawl.websitepage import WebsitePage
 from website_checker.report import report
 
 DEFAULT_OUTPUT_DIR = Path(__file__).parent.parent / "output"
-PDF_OUTPUT = Path(__file__).parent.parent / "output" / "report.pdf"
+PDF_OUTPUT = DEFAULT_OUTPUT_DIR / "report.pdf"
 
 
 class WebsiteChecker:
