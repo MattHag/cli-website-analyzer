@@ -9,7 +9,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument("url")
 @click.option("-p", "--max-pages", type=int, help="Crawl a maximum of n pages")
-@click.option("-s", "--save", is_flag=True, help="Save the report to a file")
+@click.option("-s", "--save", is_flag=True, help="Save the crawled pages to a file")
 def main(url, max_pages, save):
     if "://" not in url:
         url = "https://" + url
