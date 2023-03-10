@@ -30,9 +30,9 @@ DEV_REQUIREMENTS = [
 ]
 
 setuptools.setup(
-    name='cli-website-checker',
+    name='cli-website-analyzer',
     version='0.1.0',
-    description='Checks loading of external resources and cookies without consent',
+    description='Crawls a website, analyzes it and generates a PDF report.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='Matthias Hagmann',
@@ -44,7 +44,7 @@ setuptools.setup(
         ]
     ),
     package_data={
-        'gdpr-website-checker-cli': [
+        'cli-website-analyzer': [
             'py.typed',
         ]
     },
