@@ -65,9 +65,16 @@ make install
 ## Usage
 
 Crawl and analyze a whole website and create a PDF report with all its findings.
+If the given url doesn't start with 'https://', it will be added automatically.
 
 ```bash
 website-analyzer <yourdomain>
+```
+
+or
+
+```bash
+python cli.py <domain>
 ```
 
 ### Restrict number of pages
