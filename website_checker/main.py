@@ -46,5 +46,4 @@ class WebsiteChecker:
     def report(self, evaluated_pages: List[PageEvaluation]):
         adapter = PageContextAdapter()
         context = adapter(evaluated_pages)
-        report.HTMLReport().render(context, DEFAULT_OUTPUT_DIR / "report.html")
         return report.PDFReport().render(context, PDF_OUTPUT)
