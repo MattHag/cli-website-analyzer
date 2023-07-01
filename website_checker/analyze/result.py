@@ -18,9 +18,14 @@ class PageEvaluation:
         self.url = url
         self.title = title
         self.results = results
+        self.status = None  # worst status of all results
 
     def add_result(self, evaluation):
         self.results.append(evaluation)
+
+    def update_status(self):
+        worst_status = sorted(self.results, key=lambda x: x.status.value, reverse=True)[0]
+        self.status = Status(worst_status.status).name.lower()
 
 
 class PageContextAdapter:
@@ -33,14 +38,18 @@ class PageContextAdapter:
         for entry in summary:
             entry["status"] = Status(entry["status"]).name
         for page in evaluated_pages:
+            page.update_status()
             for result in page.results:
                 result.status = Status(result.status).name.lower()
             page.results.sort(key=lambda x: x.title)
+
+        sitemap_list = sort_by_url(evaluated_pages)
 
         context = {
             "url": evaluated_pages[0].url,
             "creation_date": datetime.now().strftime("%d.%m.%Y %H:%M"),
             "summary": summary,
+            "sitemap": sitemap_list,
             "pages": evaluated_pages,
             "descriptions": descriptions,
         }
@@ -67,3 +76,11 @@ class PageContextAdapter:
                     entry["status"] = result_value
                 test_summary[result.title] = entry
         return sorted(test_summary.values(), key=lambda x: x["title"])
+
+
+def sort_by_url(objects: list):
+    """Sorts a list of objects by their url attribute.
+
+    Any object with a url attribute can be used.
+    """
+    return sorted(objects, key=lambda page: (page.url.rstrip("/"), page))

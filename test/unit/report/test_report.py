@@ -3,10 +3,13 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 
+from website_checker.analyze import result
 from website_checker.analyze.result import PageContextAdapter, PageEvaluation, Status
 from website_checker.report import report
 
-DEFAULT_HTML_OUTPUT = Path(__file__).parent.parent.parent.parent / "output" / "report.html"
+DEFAULT_HTML_OUTPUT = (
+    Path(__file__).parent.parent.parent.parent / "output" / "report.html"
+)
 
 
 @pytest.fixture
@@ -85,3 +88,35 @@ def test_pdf_report_using_adapter(tmp_file, eval_pages):
     report.PDFReport().render(context, output_file)
 
     assert output_file.exists()
+
+
+class URLObject:
+    def __init__(self, url):
+        self.url = url
+
+    def __eq__(self, other):
+        return self.url == other.url
+
+
+def test_sort_object_by_url():
+    test_data = [
+        URLObject("https://domain.url/"),
+        URLObject("https://domain.url/contact/"),
+        URLObject("https://domain.url/service/smartphone/"),
+        URLObject("https://domain.url/service/"),
+        URLObject("https://domain.url/team/"),
+        URLObject("https://domain.url/service/pc/"),
+    ]
+
+    res = result.sort_by_url(test_data)
+
+    expected_res = [
+        URLObject("https://domain.url/"),
+        URLObject("https://domain.url/contact/"),
+        URLObject("https://domain.url/service/"),
+        URLObject("https://domain.url/service/pc/"),
+        URLObject("https://domain.url/service/smartphone/"),
+        URLObject("https://domain.url/team/"),
+    ]
+
+    assert expected_res == res

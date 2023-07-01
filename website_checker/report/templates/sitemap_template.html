@@ -1,0 +1,15 @@
+{% block section %}
+    <section>
+        <div class="container">
+            <h2>Sitemap</h2>
+            <ul class="sitemap-wrapper">
+                {%- for page in sitemap -%}
+                    <li class="sitemap-item">
+                        <a href="{{ page.url }}" target="_blank">{{ page.url }}</a>
+                        <span class="dot" data-value="{{ page.status }}"></span>
+                    </li>
+                {%- endfor -%}
+            </ul>
+        </div>
+    </section>
+{% endblock %}
