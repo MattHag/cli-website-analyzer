@@ -1,7 +1,9 @@
 import pickle
+from datetime import datetime
 from pathlib import Path
 from typing import List
 
+from website_checker import utils
 from website_checker.analyze.analyzer import Analyzer
 from website_checker.analyze.result import PageContextAdapter, PageEvaluation
 from website_checker.crawl.crawler import Crawler
@@ -9,7 +11,6 @@ from website_checker.crawl.websitepage import WebsitePage
 from website_checker.report import report
 
 DEFAULT_OUTPUT_DIR = Path(__file__).parent.parent / "output"
-PDF_OUTPUT = DEFAULT_OUTPUT_DIR / "report.pdf"
 
 
 class WebsiteChecker:
@@ -20,7 +21,16 @@ class WebsiteChecker:
         self.max_pages = max_pages
         self.save_crawled_pages = save_crawled_pages
 
-    def check(self, url) -> Path:
+        self.filename = None
+        self.creation_date = None
+
+    def check(self, url, current_datetime=None) -> Path:
+        if current_datetime is None:
+            current_datetime = datetime.now()
+        self.creation_date = utils.datetime_str(current_datetime).replace(" ", "_")
+        domainname = utils.get_domain_as_text(url)
+        max_pages_option = f"{self.max_pages}p" if self.max_pages else "full"
+        self.filename = "_".join(["Report", max_pages_option, domainname, f"{self.creation_date}.pdf"])
         crawled_pages = self.crawl(url)
         evaluation = self.evaluate(crawled_pages)
         return self.report(evaluation)
@@ -46,4 +56,4 @@ class WebsiteChecker:
     def report(self, evaluated_pages: List[PageEvaluation]):
         adapter = PageContextAdapter()
         context = adapter(evaluated_pages)
-        return report.PDFReport().render(context, PDF_OUTPUT)
+        return report.PDFReport().render(context, DEFAULT_OUTPUT_DIR / self.filename)
