@@ -17,7 +17,7 @@ def main(url, max_pages, save):
     if max_pages:
         logger.debug("Crawl up to %d pages" % max_pages)
     pdf_path = WebsiteChecker(max_pages=max_pages, save_crawled_pages=save).check(url)
-    click.echo("Report saved to: '%s'" % pdf_path)
+    click.echo("Report saved to: file://'%s'" % pdf_path)
 
 
 if __name__ == "__main__":
