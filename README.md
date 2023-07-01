@@ -68,13 +68,7 @@ Crawl and analyze a whole website and create a PDF report with all its findings.
 If the given url doesn't start with 'https://', it will be added automatically.
 
 ```bash
-website-analyzer <yourdomain>
-```
-
-or
-
-```bash
-python cli.py <domain>
+websiteanalyzer <yourdomain>
 ```
 
 ### Restrict number of pages
@@ -82,7 +76,7 @@ python cli.py <domain>
 To analyze the home page of the W3C website and create a PDF report, restrict the pages to one.
 
 ```bash
-website-analyzer https://www.w3.org/ -p 1
+websiteanalyzer https://www.w3.org/ -p 1
 ```
 
 The result is a [PDF Report of the W3C home page](docs/examples/w3c_report.pdf).
@@ -92,8 +86,8 @@ The result is a [PDF Report of the W3C home page](docs/examples/w3c_report.pdf).
 Help shows all available options.
 
 ```bash
-$ website-analyzer --help
-Usage: website-analyzer [OPTIONS] URL
+$ websiteanalyzer --help
+Usage: websiteanalyzer [OPTIONS] URL
 
 Options:
   -p, --max-pages INTEGER  Crawl a maximum of n pages
