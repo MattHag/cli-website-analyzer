@@ -28,21 +28,15 @@ def start_server():
     logger.info("Server stopped")
 
 
-@pytest.fixture
-def mock_pdf(tmp_file):
-    """Sets the PDF output to a temporary file."""
-    main.PDF_OUTPUT = tmp_file
-    yield tmp_file
-
-
-def test_integrationtest(start_server, mock_pdf):
+def test_integrationtest(start_server, tmp_path):
+    main.DEFAULT_OUTPUT_DIR = tmp_path
     expected_pdf_signature = b"%PDF"
     url = start_server
 
     analyzer = Analyzer()
-    pdf_file = main.WebsiteChecker(analyzer).check(url)
+    pdf_file = main.WebsiteChecker(analyzer).check(url, current_datetime=None)
 
-    assert pdf_file == mock_pdf
+    assert str(tmp_path) in str(pdf_file)
     assert pdf_file.is_file()
     file_bytes = pdf_file.read_bytes()
     assert file_bytes.startswith(expected_pdf_signature)
