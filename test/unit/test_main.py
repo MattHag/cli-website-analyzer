@@ -13,9 +13,7 @@ def mock_crawler_next_once(page):
         yield mock_next
 
 
-def test_main(mock_crawler_next_once, tmp_path):
-    main.DEFAULT_OUTPUT_DIR = tmp_path
-
+def test_main(mock_crawler_next_once, mock_desktop_path):
     url = "https://domain.test"
     pdf_file = main.WebsiteChecker().check(url)
 
