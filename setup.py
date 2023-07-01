@@ -30,10 +30,10 @@ def read_requirements(path):
 
 
 setuptools.setup(
-    name='cli-website-analyzer',
-    version='0.1.0',
+    name='websiteanalyzer',
+    version=read("website_checker", "VERSION"),
     description='Crawls a website, analyzes it and generates a PDF report.',
-    long_description=long_description,
+    long_description=read("README.md"),
     long_description_content_type="text/markdown",
     author='Matthias Hagmann',
     license='MIT',
@@ -44,7 +44,7 @@ setuptools.setup(
         ]
     ),
     package_data={
-        'cli-website-analyzer': [
+        'website_checker': [
             'py.typed',
         ]
     },
@@ -56,9 +56,7 @@ setuptools.setup(
     install_requires=read_requirements("requirements.txt"),
     extras_require={"dev": read_requirements("requirements-dev.txt")},
     entry_points={
-        'console_scripts': [
-            'website-analyzer=website_checker.cli:main',
-        ]
+        "console_scripts": ["websiteanalyzer = website_checker.__main__:main"]
     },
     python_requires='>=3.7, <4',
 )
