@@ -28,15 +28,15 @@ def start_server():
     logger.info("Server stopped")
 
 
-def test_integrationtest(start_server, tmp_path):
-    main.DEFAULT_OUTPUT_DIR = tmp_path
+def test_integrationtest(start_server, mock_desktop_path):
     expected_pdf_signature = b"%PDF"
     url = start_server
 
     analyzer = Analyzer()
     pdf_file = main.WebsiteChecker(analyzer).check(url, current_datetime=None)
 
-    assert str(tmp_path) in str(pdf_file)
+    assert "Report" in str(pdf_file)
+    assert "full" in str(pdf_file)
     assert pdf_file.is_file()
     file_bytes = pdf_file.read_bytes()
     assert file_bytes.startswith(expected_pdf_signature)

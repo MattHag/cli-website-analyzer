@@ -10,8 +10,6 @@ from website_checker.crawl.crawler import Crawler
 from website_checker.crawl.websitepage import WebsitePage
 from website_checker.report import report
 
-DEFAULT_OUTPUT_DIR = Path(__file__).parent.parent / "output"
-
 
 class WebsiteChecker:
     def __init__(self, analyzer=None, *, max_pages=None, save_crawled_pages=False):
@@ -43,7 +41,7 @@ class WebsiteChecker:
                 if self.max_pages and idx >= self.max_pages:
                     break
         if self.save_crawled_pages:
-            pickle.dump(pages, open(DEFAULT_OUTPUT_DIR / "pages.p", "wb"))
+            pickle.dump(pages, open(utils.get_desktop_path() / "pages.p", "wb"))
         return pages
 
     def evaluate(self, pages: List[WebsitePage]) -> List[PageEvaluation]:
@@ -56,4 +54,4 @@ class WebsiteChecker:
     def report(self, evaluated_pages: List[PageEvaluation]):
         adapter = PageContextAdapter()
         context = adapter(evaluated_pages)
-        return report.PDFReport().render(context, DEFAULT_OUTPUT_DIR / self.filename)
+        return report.PDFReport().render(context, utils.get_desktop_path() / self.filename)

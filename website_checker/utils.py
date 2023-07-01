@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from pathlib import Path
 from urllib.parse import urlparse
 
 
@@ -11,3 +12,9 @@ def get_domain_as_text(url):
 
 def datetime_str(current_datetime=datetime.now()):
     return current_datetime.strftime("%Y-%m-%d %H%M")
+
+
+def get_desktop_path():
+    home_dir = Path.home()
+    desktop_path = home_dir / "Desktop"
+    return desktop_path
