@@ -1,5 +1,5 @@
 PYTHON_BINARY := python3
-VIRTUAL_ENV := venv
+VIRTUAL_ENV := $(shell python -c "if __import__('pathlib').Path('.venv/bin/pip').exists(): print('.venv/bin/')")
 VIRTUAL_BIN := $(VIRTUAL_ENV)/bin
 PROJECT_NAME := website_checker
 TEST_DIR := test
@@ -40,7 +40,7 @@ format-check: black-check isort-check lint mypy
 
 ## install - Install the project locally
 install:
-	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
+	$(VIRTUAL_BIN)/python -m venv $(VIRTUAL_ENV)
 	$(VIRTUAL_BIN)/pip install -e ."[dev]"
 	$(VIRTUAL_BIN)/python -m playwright install chromium
 
