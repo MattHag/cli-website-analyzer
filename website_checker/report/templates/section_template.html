@@ -1,62 +1,62 @@
 {% block section %}
-<section class="content-gap">
-    <div class="container">
-        <h2>{{ page.title }}</h2>
-        <a href="{{ page.url }}">{{ page.url }}</a>
-    </div>
+    <section class="content-gap">
+        <div class="container">
+            <h2>{{ page.title }}</h2>
+            <a href="{{ page.url }}">{{ page.url }}</a>
+        </div>
 
-    <div class="container flex-gap">
-        {%- for res in page.results -%}
-        <article class="card">
-            <div class="card__header">
-                <h3>{{ res.title }}</h3>
-                <span class="badge" data-value="{{ res.status }}"></span>
-            </div>
-            <div class="card__body">
+        <div class="container flex-gap">
+            {%- for res in page.results -%}
+                <article class="card">
+                    <div class="card__header">
+                        <h3>{{ res.title }}</h3>
+                        <span class="badge" data-value="{{ res.status }}"></span>
+                    </div>
+                    <div class="card__body">
                 <!-- Text -->
-                {% if res.result.text %}
-                <p>{{ res.result.text }}</p>
-                {% endif %}
+                        {% if res.result.text %}
+                            <p>{{ res.result.text }}</p>
+                        {% endif %}
 
                 <!-- List -->
-                {% if res.result.list %}
-                <div class="table">
-                    {%- if res.result.list.heading -%}
-                    <div class="table-row table-row__entry--heading">
-                        <div class="table-row__entry"> {{ res.result.list.heading }}</div>
-                    </div>
-                    {% endif %}
+                        {% if res.result.list %}
+                            <div class="table">
+                                {%- if res.result.list.heading -%}
+                                    <div class="table-row table-row__entry--heading">
+                                        <div class="table-row__entry"> {{ res.result.list.heading }}</div>
+                                    </div>
+                                {% endif %}
 
-                    {%- for item in res.result.list.entries -%}
-                    <div class="table-row">
-                        <div class="table-row__entry">
-                            {{ item }}
-                        </div>
-                    </div>
-                    {%- endfor -%}
-                </div>
-                {% endif %}
+                                {%- for item in res.result.list.entries -%}
+                                    <div class="table-row">
+                                        <div class="table-row__entry">
+                                            {{ item }}
+                                        </div>
+                                    </div>
+                                {%- endfor -%}
+                            </div>
+                        {% endif %}
 
                 <!-- Table -->
-                {% if res.result.table %}
-                <div class="table">
-                    <div class="table-row table-row__entry--heading">
-                        {%- for heading in res.result.table.heading -%}
-                        <div class="table-row__entry"> {{ heading }}</div>
-                        {%- endfor -%}
+                        {% if res.result.table %}
+                            <div class="table">
+                                <div class="table-row table-row__entry--heading">
+                                    {%- for heading in res.result.table.heading -%}
+                                        <div class="table-row__entry"> {{ heading }}</div>
+                                    {%- endfor -%}
+                                </div>
+                                {%- for row in res.result.table.entries -%}
+                                    <div class="table-row">
+                                        {%- for col in row -%}
+                                            <div class="table-row__entry">{{ col }}</div>
+                                        {%- endfor -%}
+                                    </div>
+                                {%- endfor -%}
+                            </div>
+                        {% endif %}
                     </div>
-                    {%- for row in res.result.table.entries -%}
-                    <div class="table-row">
-                        {%- for col in row -%}
-                        <div class="table-row__entry">{{ col }}</div>
-                        {%- endfor -%}
-                    </div>
-                    {%- endfor -%}
-                </div>
-                {% endif %}
-            </div>
-        </article>
-        {% endfor %}
-    </div>
-</section>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
 {% endblock %}
