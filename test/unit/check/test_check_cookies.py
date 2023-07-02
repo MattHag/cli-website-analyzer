@@ -8,8 +8,10 @@ from website_checker.crawl.cookie import Cookie
 @pytest.mark.parametrize(
     "cookie_names, expected_status",
     [
-        (["CookieConsentBulkTicket"], Status.WARNING),
         ([], Status.OK),
+        (["CookieConsentBulkTicket"], Status.OK),
+        (["CookieConsentBulkTicket", "__ga"], Status.WARNING),
+        (["__ga"], Status.WARNING),
     ],
 )
 def test_check_cookies(cookie_names, expected_status, page):
