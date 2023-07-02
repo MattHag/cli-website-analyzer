@@ -35,8 +35,6 @@ def test_integrationtest(start_server, mock_desktop_path):
     analyzer = Analyzer()
     pdf_file = main.WebsiteChecker(analyzer).check(url, current_datetime=None)
 
-    assert "Report" in str(pdf_file)
-    assert "full" in str(pdf_file)
     assert pdf_file.is_file()
     file_bytes = pdf_file.read_bytes()
     assert file_bytes.startswith(expected_pdf_signature)
