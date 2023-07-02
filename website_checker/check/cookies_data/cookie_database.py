@@ -1,8 +1,8 @@
 import tempfile
 from pathlib import Path
-from urllib.request import urlopen
 
 import pandas as pd
+import requests
 from loguru import logger
 
 current_path = Path(__file__).parent
@@ -82,8 +82,10 @@ def update_database(url=None):
 
     def download_file(url):
         print("Downloading cookie database...")
-        with urlopen(url) as response:
-            return response.read()
+        response = requests.get(url)
+        response.raise_for_status()  # Check for any potential request errors
+
+        return response.content
 
     def check_compatibility(csv_file):
         print("Checking compatibility...")
@@ -98,7 +100,7 @@ def update_database(url=None):
             f.write(binary_data)
 
     if not url:
-        url = "https://github.com/jkwakman/Open-Cookie-Database/raw/master/open-cookie-database.csv"
+        url = "https://raw.githubusercontent.com/jkwakman/Open-Cookie-Database/master/open-cookie-database.csv"
 
     user_input()
 
@@ -113,5 +115,5 @@ def update_database(url=None):
     print(f"Cookie database '{COOKIE_DB_CSV}' updated successfully.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     update_database()
