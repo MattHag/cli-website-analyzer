@@ -221,16 +221,15 @@ h6 {
   flex-wrap: wrap;
   flex-direction: column;
   align-items: center;
-  gap: var(--row-gap);
+  row-gap: var(--row-gap);
 }
 
 .table-row {
-  position: relative;
   display: flex;
   flex-wrap: nowrap;
   width: 100%;
+  position: relative;
   align-items: center;
-  gap: var(--grid-gap);
 }
 
 .table-row:not(:last-child)::after {
@@ -248,8 +247,6 @@ h6 {
   flex: 1;
   justify-content: start;
   align-items: center;
-
-  overflow-wrap: anywhere;
 }
 
 .table-row__entry--heading {
@@ -301,22 +298,20 @@ h6 {
   flex-direction: column;
   align-items: stretch;
   width: 100%;
-  margin-top: var(--grid-gap);
-  gap: calc(var(--grid-gap) * 1);
-}
-
-.sitemap-item {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   gap: var(--grid-gap);
 }
 
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--grid-gap);
+}
+
 .dot {
-  aspect-ratio: 1;
-  height: calc(var(--text-m) * 0.75);
-  width: auto;
+  height: calc(var(--text-m) * 0.6);
+  width: calc(var(--text-m) * 0.6);
   background-color: #bbb;
   border-radius: 50%;
   display: inline-block;
