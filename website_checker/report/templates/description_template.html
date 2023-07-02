@@ -1,20 +1,20 @@
 {% block check_descriptions %}
-<section class="content-gap">
-    <div class="container">
-        <h2>Test descriptions</h2>
-    </div>
+    <section class="content-gap">
+        <div class="container">
+            <h2>Test descriptions</h2>
+        </div>
 
-    <div class="container content-gap">
-        {%- for title, desc in descriptions -%}
-        <article class="card">
-            <div class="card__header card__header--light">
-                <h3>{{ title }}</h3>
-            </div>
-            <div class="card__body content-gap">
-                <p>{{ desc }}</p>
-            </div>
-        </article>
-        {% endfor %}
-    </div>
-</section>
+        <div class="container content-gap">
+            {%- for title, desc in descriptions -%}
+                <article class="card">
+                    <div class="card__header card__header--light">
+                        <h3>{{ title }}</h3>
+                    </div>
+                    <div class="card__body content-gap">
+                        <p>{{ desc }}</p>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
 {% endblock %}
