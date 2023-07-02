@@ -28,9 +28,7 @@ class WebsiteChecker:
         self.creation_date = utils.datetime_str(current_datetime).replace(" ", "_")
         domainname = utils.get_domain_as_text(url)
         max_pages_option = f"{self.max_pages}p" if self.max_pages else "full"
-        self.filename = "_".join(
-            ["Report", max_pages_option, domainname, f"{self.creation_date}.pdf"]
-        )
+        self.filename = "_".join(["Report", max_pages_option, domainname, f"{self.creation_date}.pdf"])
         crawled_pages = self.crawl(url)
         evaluation = self.evaluate(crawled_pages)
         return self.report(evaluation)
@@ -56,6 +54,4 @@ class WebsiteChecker:
     def report(self, evaluated_pages: List[PageEvaluation]):
         adapter = PageContextAdapter()
         context = adapter(evaluated_pages)
-        return report.PDFReport().render(
-            context, utils.get_desktop_path() / self.filename
-        )
+        return report.PDFReport().render(context, utils.get_desktop_path() / self.filename)

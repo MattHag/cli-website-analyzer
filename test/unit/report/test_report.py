@@ -7,9 +7,7 @@ from website_checker.analyze import result
 from website_checker.analyze.result import PageContextAdapter, PageEvaluation, Status
 from website_checker.report import report
 
-DEFAULT_HTML_OUTPUT = (
-    Path(__file__).parent.parent.parent.parent / "output" / "report.html"
-)
+DEFAULT_HTML_OUTPUT = Path(__file__).parent.parent.parent.parent / "output" / "report.html"
 
 
 @pytest.fixture
