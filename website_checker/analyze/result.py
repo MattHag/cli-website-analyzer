@@ -26,6 +26,9 @@ class PageEvaluation:
     def update_status(self):
         worst_status = sorted(self.results, key=lambda x: x.status.value, reverse=True)[0]
         self.status = Status(worst_status.status).name.lower()
+        for entry in self.results:
+            entry.res = Status(entry.status).name.lower()
+        self.results.sort(key=lambda x: x.title)
 
 
 class PageContextAdapter:

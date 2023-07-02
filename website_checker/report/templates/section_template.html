@@ -1,18 +1,18 @@
 {% block section %}
 <section class="content-gap">
-    <div class="hero">
+    <div class="container">
         <h2>{{ page.title }}</h2>
         <a href="{{ page.url }}">{{ page.url }}</a>
     </div>
 
-    <div class="content-gap">
+    <div class="container flex-gap">
         {%- for res in page.results -%}
         <article class="card">
             <div class="card__header">
                 <h3>{{ res.title }}</h3>
                 <span class="badge" data-value="{{ res.status }}"></span>
             </div>
-            <div class="card__body content-gap">
+            <div class="card__body">
                 <!-- Text -->
                 {% if res.result.text %}
                 <p>{{ res.result.text }}</p>
