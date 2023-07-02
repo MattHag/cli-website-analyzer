@@ -247,6 +247,8 @@ h6 {
   flex: 1;
   justify-content: start;
   align-items: center;
+
+  overflow-wrap: anywhere;
 }
 
 .table-row__entry--heading {
