@@ -1,7 +1,7 @@
 import pickle
 from datetime import datetime
 from pathlib import Path
-from typing import List
+from typing import Any, List, Tuple
 
 from website_checker import utils
 from website_checker.analyze.analyzer import Analyzer
@@ -29,20 +29,21 @@ class WebsiteChecker:
         domainname = utils.get_domain_as_text(url)
         max_pages_option = f"{self.max_pages}p" if self.max_pages else "full"
         self.filename = "_".join(["Report", max_pages_option, domainname, f"{self.creation_date}.pdf"])
-        crawled_pages = self.crawl(url)
+        crawled_pages, screenshot = self.crawl(url)
         evaluation = self.evaluate(crawled_pages)
-        return self.report(evaluation)
+        return self.report(evaluation, screenshot)
 
-    def crawl(self, url) -> List[WebsitePage]:
+    def crawl(self, url) -> Tuple[List[WebsitePage], Any]:
         pages = []
         with Crawler(url) as crawler:
             for idx, page in enumerate(crawler, start=1):
                 pages.append(page)
                 if self.max_pages and idx >= self.max_pages:
                     break
+            screenshot_buffer = crawler.screenshot_encoded
         if self.save_crawled_pages:
             pickle.dump(pages, open(utils.get_desktop_path() / "pages.p", "wb"))
-        return pages
+        return pages, screenshot_buffer
 
     def evaluate(self, pages: List[WebsitePage]) -> List[PageEvaluation]:
         evaluated_data = []
@@ -51,7 +52,7 @@ class WebsiteChecker:
             evaluated_data.append(eval_result)
         return evaluated_data
 
-    def report(self, evaluated_pages: List[PageEvaluation]):
+    def report(self, evaluated_pages: List[PageEvaluation], screenshot=None):
         adapter = PageContextAdapter()
-        context = adapter(evaluated_pages)
+        context = adapter(evaluated_pages, screenshot)
         return report.PDFReport().render(context, utils.get_desktop_path() / self.filename)

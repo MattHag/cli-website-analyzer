@@ -251,6 +251,21 @@ h6 {
   overflow-wrap: anywhere;
 }
 
+.screenshot {
+  position: relative;
+  display: block;
+  aspect-ratio: 16/9;
+  width: 400px;
+  height: auto;
+
+  margin-top: var(--grid-gap);
+}
+
+.screenshot img {
+  object-fit: cover;
+  border-radius: var(--card-radius);
+}
+
 .table-row__entry--heading {
   color: #888;
   font-weight: 700;
@@ -305,10 +320,10 @@ h6 {
 }
 
 .sitemap-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--grid-gap);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--grid-gap);
 }
 
 .dot {

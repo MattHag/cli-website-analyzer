@@ -1,6 +1,6 @@
 import time
 import urllib
-from typing import List, Set, Union
+from typing import Any, List, Set, Union
 from urllib.parse import ParseResult, urldefrag, urljoin, urlparse
 
 from loguru import logger
@@ -83,6 +83,7 @@ class Crawler(CrawlerBase):
         self.responses: List = []
         self.requests: List = []
         self.failed_requests: List = []
+        self.screenshot_encoded: Any = None
 
         self._p = sync_playwright().start()
         self._browser = self._p.chromium.launch(headless=True)
@@ -150,6 +151,9 @@ class Crawler(CrawlerBase):
             elements = [create_resource(response) for response in self.responses]
             requests = [ResourceRequest(url=req.url, sizes=req.sizes()) for req in self.requests if not req.failure]
             failed_requests = [ResourceRequest(url=req.url, failure=req.failure) for req in self.failed_requests]
+
+            if self.screenshot_encoded is None:
+                self.screenshot_encoded = page.screenshot()
 
             self._collect_links(page, current_url)
         finally:

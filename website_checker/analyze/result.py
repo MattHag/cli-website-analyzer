@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List
@@ -32,7 +33,7 @@ class PageEvaluation:
 
 
 class PageContextAdapter:
-    def __call__(self, evaluated_pages: List[PageEvaluation]) -> Dict[str, Any]:
+    def __call__(self, evaluated_pages: List[PageEvaluation], screenshot=None) -> Dict[str, Any]:
         """Adapts analyzer results to a context for report creation."""
         evaluated_pages.sort(key=lambda x: x.url)
 
@@ -56,6 +57,9 @@ class PageContextAdapter:
             "pages": evaluated_pages,
             "descriptions": descriptions,
         }
+        if screenshot:
+            screenshot_bytes = base64.b64encode(screenshot).decode()
+            context.update({"screenshot": screenshot_bytes})
         return context
 
     def collect_test_descriptions(self, evaluated_pages):
