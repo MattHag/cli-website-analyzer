@@ -3,6 +3,12 @@
         <div class="container header">
             <h1>Website report</h1>
             <a href="{{ url }}">{{ url }}</a>
+
+            {% if screenshot %}
+                <figure class="screenshot">
+                    <img width="1280" height="720" alt="Website screenshot" src="data:image/png;base64,{{ screenshot }}">
+                </figure>
+            {% endif %}
         </div>
 
         {% if summary %}
