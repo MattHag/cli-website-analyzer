@@ -1,9 +1,11 @@
 import bisect
+import re
 import time
 import urllib
 from typing import Any, List, Set, Union
 from urllib.parse import ParseResult, urldefrag, urljoin, urlparse
 
+import requests
 from loguru import logger
 from playwright.sync_api import BrowserContext, Page, Request, Response, sync_playwright
 
@@ -150,8 +152,12 @@ class Crawler(CrawlerBase):
             temp_cookies = page.context.cookies()
             cookies = [Cookie(name=cookie["name"]) for cookie in temp_cookies]
             elements = [create_resource(response) for response in self.responses]
-            requests = [ResourceRequest(url=req.url, sizes=req.sizes()) for req in self.requests if not req.failure]
+            fine_requests = [
+                ResourceRequest(url=req.url, sizes=req.sizes()) for req in self.requests if not req.failure
+            ]
             failed_requests = [ResourceRequest(url=req.url, failure=req.failure) for req in self.failed_requests]
+
+            handle_favicons(html, elements, failed_requests)
 
             if self.screenshot_encoded is None:
                 self.screenshot_encoded = page.screenshot()
@@ -166,7 +172,7 @@ class Crawler(CrawlerBase):
             html=html,
             cookies=cookies,
             elements=elements,
-            requests=requests,
+            requests=fine_requests,
             failed_requests=failed_requests,
         )
 
@@ -235,3 +241,39 @@ def add_element_sorted_unique(lst, item):
     index = bisect.bisect_left(lst, item)
     if index == len(lst) or lst[index] != item:
         lst.insert(index, item)
+
+
+def handle_favicons(html: str, elements: List[Resource], failed_requests: List[ResourceRequest]):
+    """Special handling for favicons as long as Playwright does not support them."""
+
+    def extract_all_icon_urls(raw_html: str):
+        pattern = r'<link[^>]*rel=["\'](?:shortcut )?icon["\'][^>]*href=["\']([^"\']+)["\'][^>]*>'
+        matches = re.findall(pattern, raw_html, re.I)
+        return matches
+
+    def favicon_loads(icon_url: str) -> tuple[bool, Any]:
+        try:
+            response = requests.get(url, allow_redirects=False)
+            if response.status_code == 200:
+                # Check if the response contains valid image data
+                if "image" in str(response.headers.get("content-type")):
+                    return True, response.headers
+            return False, None
+        except requests.exceptions.RequestException:
+            return False, None
+
+    def is_url_not_in_list(item_url, object_list):
+        for obj in object_list:
+            if obj.url == item_url:
+                return False
+        return True
+
+    icon_urls = extract_all_icon_urls(html)
+    for url in icon_urls:
+        loads, headers = favicon_loads(url)
+        if loads:
+            if is_url_not_in_list(url, elements):
+                elements.append(Resource(url=url, headers=headers, status_code=200))
+        else:
+            if is_url_not_in_list(url, failed_requests):
+                failed_requests.append(ResourceRequest(url=url, failure=400))
