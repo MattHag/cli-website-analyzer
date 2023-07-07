@@ -37,6 +37,28 @@
                             </div>
                         {% endif %}
 
+                        {% if res.result.accessibility %}
+                            <div class="table">
+                                {%- for id, impact, target, help, screenshot in res.result.accessibility -%}
+                                    <div class="accessibility-item">
+                                        <div class="accessibility-item__content">
+                                            <p>ID: {{ id }}</p>
+                                            <div>Impact: {{ impact }}</div>
+                                            <div>Target: {{ target }}</div>
+                                            <div>Help: {{ help }}</div>
+                                        </div>
+                                        {% if screenshot %}
+                                            <div class="accessibility-item__media">
+                                                <figure class="small">
+                                                    <img width="1280" height="720" src="data:image/png;base64,{{ screenshot }}">
+                                                </figure>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {%- endfor -%}
+                            </div>
+                        {% endif %}
+
                 <!-- Table -->
                         {% if res.result.table %}
                             <div class="table">

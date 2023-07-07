@@ -4,7 +4,17 @@ from website_checker.crawl.cookie import Cookie
 
 
 class WebsitePage:
-    def __init__(self, url="", title="", html="", cookies=None, elements=None, requests=None, failed_requests=None):
+    def __init__(
+        self,
+        url="",
+        title="",
+        html="",
+        cookies=None,
+        elements=None,
+        requests=None,
+        failed_requests=None,
+        accessibility: list = None,
+    ):
         if elements is None:
             elements = []
         if cookies is None:
@@ -13,6 +23,8 @@ class WebsitePage:
             requests = []
         if failed_requests is None:
             failed_requests = []
+        if accessibility is None:
+            accessibility = []
         self.url = url
         self.title = title
         self.html = html
@@ -20,6 +32,7 @@ class WebsitePage:
         self.elements = elements
         self.requests = requests
         self.failed_requests = failed_requests
+        self.accessibility = accessibility
         self.created = datetime.now()
 
     def add_cookie(self, cookie: Cookie):

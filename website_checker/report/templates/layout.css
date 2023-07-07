@@ -209,6 +209,25 @@ h6 {
   row-gap: var(--content-gap);
 }
 
+.accessibility-item {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.accessibility-item__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--grid-gap);
+}
+
+.accessibility-item img {
+  display: block;
+  margin-left: auto;
+}
+
 .table {
   width: 100%;
   display: flex;
@@ -254,7 +273,16 @@ figure img {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  border: solid 2px var(--primary-color-light);
+}
+
+.small img {
+  display: block;
+
+  width: 300px;
+  height: auto;
+  max-height: 80px;
+  object-fit: contain;
+  max-width: 100%;
 }
 
 .screenshot img {
@@ -265,6 +293,7 @@ figure img {
   height: auto;
   object-fit: cover;
   max-width: 100%;
+  border: solid 2px var(--primary-color-light);
   border-radius: var(--card-radius);
 }
 

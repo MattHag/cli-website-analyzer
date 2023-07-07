@@ -7,6 +7,7 @@ from urllib.parse import ParseResult, urldefrag, urljoin, urlparse
 from loguru import logger
 from playwright.sync_api import BrowserContext, Page, Request, Response, sync_playwright
 
+from website_checker.crawl.axe.axe_runner import Axe
 from website_checker.crawl.cookie import Cookie
 from website_checker.crawl.crawlerbase import CrawlerBase
 from website_checker.crawl.resource import Resource, ResourceRequest
@@ -114,7 +115,7 @@ class Crawler(CrawlerBase):
         try:
             return self._next_page(next_url)
         except Exception as e:
-            logger.error(f"Error while crawling: {e}")
+            logger.error(f"Error while next: {e}")
             return self.next()
 
     def _reset_data(self):
@@ -150,14 +151,29 @@ class Crawler(CrawlerBase):
             temp_cookies = page.context.cookies()
             cookies = [Cookie(name=cookie["name"]) for cookie in temp_cookies]
             elements = [create_resource(response) for response in self.responses]
-            requests = [ResourceRequest(url=req.url, sizes=req.sizes()) for req in self.requests if not req.failure]
-            failed_requests = [ResourceRequest(url=req.url, failure=req.failure) for req in self.failed_requests]
+            requests = [
+                ResourceRequest(url=req.url, sizes=req.sizes())
+                for req in self.requests
+                if not req.failure
+            ]
+            failed_requests = [
+                ResourceRequest(url=req.url, failure=req.failure)
+                for req in self.failed_requests
+            ]
 
             if self.screenshot_encoded is None:
                 self.screenshot_encoded = page.screenshot()
 
+            accessibility = Axe()
+            axe_result = accessibility.run_check(page)
+            axe_results = accessibility.evaluate(page, axe_result)
+
             self._collect_links(page, current_url)
+        except Exception as e:
+            logger.error(f"Error while crawling: {e}")
+            raise e
         finally:
+            logger.debug(f"Close context: {current_url}")
             self.context.close()
 
         return WebsitePage(
@@ -168,6 +184,7 @@ class Crawler(CrawlerBase):
             elements=elements,
             requests=requests,
             failed_requests=failed_requests,
+            accessibility=axe_results,
         )
 
     def normalize_url(self, link, current_url):
@@ -204,9 +221,15 @@ class Crawler(CrawlerBase):
         visited_links = {link.rstrip("/") for link in self.visited_links}
         unvisited_links = links - visited_links
 
-        internal_links = {link for link in unvisited_links if type(link) == str and is_internal_link(link, self.domain)}
+        internal_links = {
+            link
+            for link in unvisited_links
+            if type(link) == str and is_internal_link(link, self.domain)
+        }
         images = (".png", ".jpg", ".jpeg", ".webp", "avif")
-        unvisited_internal_pages = {link for link in internal_links if not link.endswith(images)}
+        unvisited_internal_pages = {
+            link for link in internal_links if not link.endswith(images)
+        }
         for link in unvisited_internal_pages:
             self._add_url(link)
 

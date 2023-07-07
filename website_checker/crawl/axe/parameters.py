@@ -22,5 +22,4 @@ class Parameters:
         self.ignoreCodes = ignore_codes
 
     def to_json(self):
-        self
         return json.dumps(self.__dict__)
