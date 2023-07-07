@@ -1,3 +1,4 @@
+import bisect
 import time
 import urllib
 from typing import Any, List, Set, Union
@@ -77,7 +78,7 @@ class NopageException(Exception):
 class Crawler(CrawlerBase):
     def __init__(self, url: str):
         self.domain = get_base_domain(url)
-        self.collected_links: Set = set()
+        self.collected_links: list = []
         self.visited_links: Set = set()
 
         self.responses: List = []
@@ -108,7 +109,7 @@ class Crawler(CrawlerBase):
             raise StopIteration
 
     def next(self) -> WebsitePage:
-        next_url = self.collected_links.pop()
+        next_url = self.collected_links.pop(0)
         logger.info(f"Visit next: {next_url}")
         try:
             return self._next_page(next_url)
@@ -188,7 +189,7 @@ class Crawler(CrawlerBase):
     def _add_url(self, url):
         """Adds a url to the crawler."""
         normalized_url = self.normalize_url(url, self.domain)
-        self.collected_links.add(normalized_url)
+        add_element_sorted_unique(self.collected_links, normalized_url)
 
     def _collect_links(self, page: Page, current_url: str):
         """Extracts all <a href=""> links from the page."""
@@ -224,3 +225,9 @@ class Crawler(CrawlerBase):
         if not self.responses:
             download.cancel()
             raise NopageException(download.url)
+
+
+def add_element_sorted_unique(lst, item):
+    index = bisect.bisect_left(lst, item)
+    if index == len(lst) or lst[index] != item:
+        lst.insert(index, item)
