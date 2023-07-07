@@ -66,7 +66,6 @@ section {
   }
 }
 
-
 .container {
   width: var(--max-page-width);
   align-items: flex-start;
@@ -76,9 +75,8 @@ section {
   margin-right: auto;
 }
 
-.flex-gap {
-  display: flex;
-  gap: var(--content-gap);
+.grid-gap {
+  gap: var(--grid-gap);
 }
 
 .content-gap {
@@ -151,10 +149,13 @@ h6 {
 .frontpage {
   display: flex;
   flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  gap: calc(var(--content-gap) * 2);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.frontpage > * {
   align-items: center;
-  gap: var(--content-gap);
 }
 
 .header {
@@ -162,15 +163,6 @@ h6 {
   flex-direction: column;
   align-items: center;
 }
-
-.footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  margin-top: auto;
-}
-
 
 .card {
   width: 100%;
@@ -198,14 +190,16 @@ h6 {
   background-color: var(--primary-color-lighter);
 }
 
+.card__header--text {
+  align-items: flex-end;
+}
+
 .card__heading {
   font-size: var(--text-l);
-  /*font-weight: 700;*/
 }
 
 .card__description {
-  font-size: var(--text-xs);
-  color: var(--primary-color-lighter);
+  opacity: 80%;
 }
 
 .card__body {
@@ -251,18 +245,26 @@ h6 {
   overflow-wrap: anywhere;
 }
 
-.screenshot {
-  position: relative;
-  display: block;
-  aspect-ratio: 16/9;
-  width: 400px;
-  height: auto;
+figure {
+  width: 100%;
+  margin: 0;
+}
 
-  margin-top: var(--grid-gap);
+figure img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  border: solid 2px var(--primary-color-light);
 }
 
 .screenshot img {
+  display: block;
+
+  width: 60%;
+  aspect-ratio: 16/9;
+  height: auto;
   object-fit: cover;
+  max-width: 100%;
   border-radius: var(--card-radius);
 }
 
