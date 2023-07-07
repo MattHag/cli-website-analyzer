@@ -1,11 +1,17 @@
 import tempfile
 from pathlib import Path
 
+from loguru import logger
+
 from website_checker.report import utilities
 
 DEFAULT_TEMPLATE = Path(__file__).parent / "templates" / "base_template.html"
 DEFAULT_PDF_OUTPUT = Path(__file__).parent.parent.parent / "output" / "report.pdf"
 DEFAULT_HTML_OUTPUT = Path(__file__).parent.parent.parent / "output" / "report.html"
+
+DEBUG = False
+if DEBUG:
+    logger.debug("Debug mode enabled. Use default output paths.")
 
 
 class ReportTemplate:
@@ -19,6 +25,8 @@ class ReportTemplate:
 class HTMLReport(ReportTemplate):
     def render(self, data, path: Path) -> Path:
         """Builds an HTML report from the given data."""
+        if DEBUG:
+            path = DEFAULT_HTML_OUTPUT
         utilities.build_html(self.html_template, data, path)
         return path
 
@@ -26,6 +34,8 @@ class HTMLReport(ReportTemplate):
 class PDFReport(HTMLReport):
     def render(self, data, path: Path) -> Path:
         """Builds a PDF report from the given data."""
+        if DEBUG:
+            path = DEFAULT_PDF_OUTPUT
         with tempfile.NamedTemporaryFile() as tmp_file:
             html = super().render(data, Path(tmp_file.name))
             utilities.html_to_pdf(html, path)
