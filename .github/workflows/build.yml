@@ -17,7 +17,7 @@ jobs:
         run: make install
       - name: Check format
         run: make format-check
-  test:
+  test_linux:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -40,3 +40,20 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: "./coverage.lcov"
+  test_mac:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        pythonversion: ["3.11"]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.pythonversion }}
+          cache: pip
+      - name: Install Dependencies
+        run: make install
+      - name: Run tests
+        run: make test
