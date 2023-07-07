@@ -170,25 +170,12 @@ class Crawler(CrawlerBase):
             failed_requests=failed_requests,
         )
 
-    def normalize_url(self, link, current_url):
-        """Normalize a URL to a full URL."""
-        link, _ = urldefrag(link)
-        # absolute link
-        if link.startswith("http://") or link.startswith("https://"):
-            return link
-        # root-relative link
-        elif link.startswith("/"):
-            return f"{self.domain}{link}"
-        # relative link
-        else:
-            # urljoin requires a trailing slash
-            if not current_url.endswith("/"):
-                current_url += "/"
-            return urljoin(current_url, link)
+    def _normalize_url(self, link, current_url):
+        return normalize_url(self.domain, link, current_url)
 
     def _add_url(self, url):
         """Adds a url to the crawler."""
-        normalized_url = self.normalize_url(url, self.domain)
+        normalized_url = self._normalize_url(url, self.domain)
         add_element_sorted_unique(self.collected_links, normalized_url)
 
     def _collect_links(self, page: Page, current_url: str):
@@ -197,7 +184,7 @@ class Crawler(CrawlerBase):
         link_elements = page.query_selector_all(css_selector)
 
         links = {link.get_attribute("href") for link in link_elements}
-        links = {self.normalize_url(link, current_url) for link in links}
+        links = {self._normalize_url(link, current_url) for link in links}
 
         # remove / at end of url for comparison
         links = {link.rstrip("/") for link in links if type(link) == str}
@@ -225,6 +212,23 @@ class Crawler(CrawlerBase):
         if not self.responses:
             download.cancel()
             raise NopageException(download.url)
+
+
+def normalize_url(domain: str, link: str, current_url: str) -> str:
+    """Normalize a URL to a full URL."""
+    link, _ = urldefrag(link)
+    # absolute link
+    if link.startswith("http://") or link.startswith("https://"):
+        return link
+    # root-relative link
+    elif link.startswith("/"):
+        return f"{domain}{link}"
+    # relative link
+    else:
+        # urljoin requires a trailing slash
+        if not current_url.endswith("/"):
+            current_url += "/"
+        return urljoin(current_url, link)
 
 
 def add_element_sorted_unique(lst, item):
