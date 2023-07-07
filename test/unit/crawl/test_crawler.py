@@ -4,7 +4,12 @@ import playwright
 import pytest
 
 from website_checker.crawl.cookie import Cookie
-from website_checker.crawl.crawler import Crawler, get_base_domain, is_internal_link
+from website_checker.crawl.crawler import (
+    Crawler,
+    add_element_sorted_unique,
+    get_base_domain,
+    is_internal_link,
+)
 from website_checker.crawl.resource import Resource
 from website_checker.crawl.websitepage import WebsitePage
 
@@ -163,3 +168,15 @@ def test_is_not_internal(url):
     internal = is_internal_link(url, domain)
 
     assert not internal
+
+
+def test_add_element_sorted_unique():
+    data = ["bbb", "ddd"]
+    expected_data = ["aaa", "bbb", "ccc", "ddd", "eee"]
+
+    add_element_sorted_unique(data, "ccc")  # Add to middle
+    add_element_sorted_unique(data, "eee")  # Add to end
+    add_element_sorted_unique(data, "aaa")  # Add to beginning
+    add_element_sorted_unique(data, "bbb")  # Add duplicate
+
+    assert data == expected_data
