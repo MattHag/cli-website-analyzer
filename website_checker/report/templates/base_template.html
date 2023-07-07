@@ -1,21 +1,24 @@
 <!doctype html>
 <html lang="en">
     <head>
+        <title>Website report</title>
         <meta charset="utf-8">
         <style type="text/css">
             {% include "layout.css" %}
         </style>
     </head>
     <body>
-        {%- include 'frontpage_template.html' -%}
-        {% if sitemap %}
-            {%- include 'sitemap_template.html' -%}
-        {% endif %}
-        {% for page in pages %}
-            {%- include 'section_template.html' -%}
-        {% endfor %}
-        {% if descriptions %}
-            {%- include 'description_template.html' -%}
-        {% endif %}
+        <main>
+            {%- include 'frontpage_template.html' -%}
+            {% if sitemap %}
+                {%- include 'sitemap_template.html' -%}
+            {% endif %}
+            {% for page in pages %}
+                {%- include 'section_template.html' -%}
+            {% endfor %}
+            {% if descriptions %}
+                {%- include 'description_template.html' -%}
+            {% endif %}
+        </main>
     </body>
 </html>
