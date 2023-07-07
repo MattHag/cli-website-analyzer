@@ -33,10 +33,10 @@ black-check:
 	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/ --check
 
 ## format - Runs all formatting tools against the project
-format: black isort lint mypy
+format: black isort lint
 
 ## format-check - Checks if the project is formatted correctly against all formatting rules
-format-check: black-check isort-check lint mypy
+format-check: black-check isort-check lint
 
 ## install - Install the project locally
 install:
