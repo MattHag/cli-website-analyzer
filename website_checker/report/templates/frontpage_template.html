@@ -2,8 +2,11 @@
     <section class="frontpage">
         <div class="container header">
             <h1>Website report</h1>
-            <a href="{{ url }}">{{ url }}</a>
+            <p>{{ creation_date }}</p>
+        </div>
 
+        <div class="container grid-gap">
+            <a href="{{ url }}">{{ url }}</a>
             {% if screenshot %}
                 <figure class="screenshot">
                     <img width="1280" height="720" alt="Website screenshot" src="data:image/png;base64,{{ screenshot }}">
@@ -14,8 +17,13 @@
         {% if summary %}
             <div class="container">
                 <article class="card">
-                    <div class="card__header card__header--light">
+                    <div class="card__header card__header--text card__header--light">
                         <h2 class="card__heading">Summary</h2>
+                        {% if pages | length == 1 %}
+                            <p class="card__description">one page analyzed</p>
+                        {% else %}
+                            <p class="card__description">{{ pages | length }} pages analyzed</p>
+                        {% endif %}
                     </div>
                     <div class="card__body">
                         <div class="table">
@@ -30,17 +38,5 @@
                 </article>
             </div>
         {% endif %}
-
-        <div class="footer content-gap">
-            <div>
-                {% if pages | length == 1 %}
-                    <p>1 page analyzed.</p>
-                {% else %}
-                    <p>{{ pages | length }} pages analyzed.</p>
-                {% endif %}
-            </div>
-
-            <div class="footer__date">{{ creation_date }}</div>
-        </div>
     </section>
 {% endblock %}
