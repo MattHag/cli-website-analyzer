@@ -9,6 +9,7 @@ from website_checker.crawl.crawler import (
     add_element_sorted_unique,
     get_base_domain,
     is_internal_link,
+    normalize_url,
 )
 from website_checker.crawl.resource import Resource
 from website_checker.crawl.websitepage import WebsitePage
@@ -87,42 +88,42 @@ def test_crawler_cookies(mock_crawler):
     assert next_page.cookies
 
 
-def test_normalize_url_absolute(mock_crawler):
+def test_normalize_url_absolute():
     current_url = f"{BASE_URL}/unknown"
     expected_url = BASE_URL
 
-    normalized_url = mock_crawler.normalize_url(BASE_URL, current_url)
+    normalized_url = normalize_url(BASE_URL, BASE_URL, current_url)
 
     assert normalized_url == expected_url
 
 
-def test_normalize_url_root_relative(mock_crawler):
+def test_normalize_url_root_relative():
     current_url = f"{BASE_URL}/unknown"
     link = "/test"
 
     expected_url = f"{BASE_URL}{link}"
 
-    normalized_url = mock_crawler.normalize_url(link, current_url)
+    normalized_url = normalize_url(BASE_URL, link, current_url)
 
     assert normalized_url == expected_url
 
 
-def test_normalize_url_relative(mock_crawler):
+def test_normalize_url_relative():
     current_url = f"{BASE_URL}/subdirectory"
     link = "test"
     expected_url = f"{current_url}/{link}"
 
-    normalized_url = mock_crawler.normalize_url(link, current_url)
+    normalized_url = normalize_url(BASE_URL, link, current_url)
 
     assert normalized_url == expected_url
 
 
-def test_normalize_removes_fragment(mock_crawler):
+def test_normalize_removes_fragment():
     current_url = BASE_URL
     link = "test#fragment"
     expected_url = f"{current_url}/test"
 
-    normalized_url = mock_crawler.normalize_url(link, current_url)
+    normalized_url = normalize_url(BASE_URL, link, current_url)
 
     assert normalized_url == expected_url
 
