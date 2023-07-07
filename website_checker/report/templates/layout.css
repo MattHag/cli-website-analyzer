@@ -269,7 +269,7 @@ figure img {
 }
 
 .table-row__entry--heading {
-  color: #888;
+  color: var(--primary-color-lighter);
   font-weight: 700;
   letter-spacing: 0.05em;
   font-size: var(--text-s);
