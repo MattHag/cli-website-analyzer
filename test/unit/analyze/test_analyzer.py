@@ -11,7 +11,7 @@ class InvalidClass(metaclass=abc.ABCMeta):
     pass
 
 
-class TestAnalyzer(BaseAnalyzer):
+class AnalyzerTest(BaseAnalyzer):
     def check(self, page):
         pass
 
@@ -19,7 +19,7 @@ class TestAnalyzer(BaseAnalyzer):
 def test_register_analyzers():
     analyzer = Analyzer()
 
-    assert TestAnalyzer in analyzer.registry.values()
+    assert AnalyzerTest in analyzer.registry.values()
     assert InvalidClass not in analyzer.registry.values()
 
 
@@ -49,7 +49,10 @@ def test_run_analyzer(page):
             },
         ),
         (
-            {"heading": ["h1", "h2"], "entries": [["col11", "col21"], ["col12", "col22"]]},
+            {
+                "heading": ["h1", "h2"],
+                "entries": [["col11", "col21"], ["col12", "col22"]],
+            },
             {
                 "table": {
                     "heading": ["h1", "h2"],
@@ -63,7 +66,7 @@ def test_run_analyzer(page):
     ],
 )
 def test_base_analyzer_save_result_text(input, expected_result):
-    analyzer = TestAnalyzer()
+    analyzer = AnalyzerTest()
 
     analyzer.save_result(input, mock.Mock())
 
