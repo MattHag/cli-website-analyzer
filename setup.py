@@ -30,22 +30,22 @@ def read_requirements(path):
 
 
 setuptools.setup(
-    name='websiteanalyzer',
+    name="websiteanalyzer",
     version=read("website_checker", "VERSION"),
-    description='Crawls a website, analyzes it and generates a PDF report.',
+    description="Crawls a website, analyzes it and generates a PDF report.",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
-    author='Matthias Hagmann',
-    license='MIT',
+    author="Matthias Hagmann",
+    license="MIT",
     packages=setuptools.find_packages(
         exclude=[
-            'examples',
-            'test',
+            "examples",
+            "test",
         ]
     ),
     package_data={
-        'website_checker': [
-            'py.typed',
+        "website_checker": [
+            "py.typed",
         ]
     },
     classifiers=[
@@ -58,5 +58,5 @@ setuptools.setup(
     entry_points={
         "console_scripts": ["websiteanalyzer = website_checker.__main__:main"]
     },
-    python_requires='>=3.7, <4',
+    python_requires=">=3.9, <4",
 )
