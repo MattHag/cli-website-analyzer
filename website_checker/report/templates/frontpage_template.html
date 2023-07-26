@@ -38,5 +38,13 @@
                 </article>
             </div>
         {% endif %}
+
+        {% if tags is defined and tags|length > 0 %}
+            <ul class="tags-wrapper">
+                {% for tag in tags %}
+                    <li><span class="badge" data-value="{{ tag }}"></span></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     </section>
 {% endblock %}
