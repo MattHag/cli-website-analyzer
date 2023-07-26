@@ -276,6 +276,12 @@ figure img {
   text-transform: uppercase;
 }
 
+.tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--grid-gap);
+}
+
 .badge {
   display: block;
   height: fit-content;
