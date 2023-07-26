@@ -32,7 +32,8 @@ class Analyzer:
         for analyzer_class in self.__class__.registry.values():
             result = analyzer_class().check(page)
             if result:
-                page_result.add_result(result)
+                if not result.hidden:
+                    page_result.add_result(result)
                 if result.tags:
                     page_result.set_tags(result.tags)
         return page_result

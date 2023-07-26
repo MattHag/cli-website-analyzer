@@ -15,6 +15,9 @@ CMS_CLASSES = {
 
 
 class DetectPageBuilder(base_analyzer.BaseAnalyzer):
+    def __init__(self):
+        super().__init__(hidden=True)
+
     def check(self, page):
         self.title = "Detect Page Builder"
 
