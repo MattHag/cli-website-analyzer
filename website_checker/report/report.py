@@ -1,11 +1,17 @@
+import os
 import tempfile
 from pathlib import Path
 
 from website_checker.report import utilities
 
 DEFAULT_TEMPLATE = Path(__file__).parent / "templates" / "base_template.html"
-DEFAULT_PDF_OUTPUT = Path(__file__).parent.parent.parent / "output" / "report.pdf"
-DEFAULT_HTML_OUTPUT = Path(__file__).parent.parent.parent / "output" / "report.html"
+
+DEBUG = False
+if os.environ.get("DEBUG"):
+    DEBUG = True
+
+DEFAULT_OUTPUT_PATH = Path(__file__).parent.parent.parent / "output"
+DEFAULT_HTML_OUTPUT = DEFAULT_OUTPUT_PATH / "report.html"
 
 
 class ReportTemplate:
@@ -17,10 +23,12 @@ class ReportTemplate:
 
 
 class HTMLReport(ReportTemplate):
-    def render(self, data, path: Path) -> Path:
+    def render(self, data, html_path: Path) -> Path:
         """Builds an HTML report from the given data."""
-        utilities.build_html(self.html_template, data, path)
-        return path
+        if DEBUG:
+            html_path = DEFAULT_HTML_OUTPUT
+        utilities.build_html(self.html_template, data, html_path)
+        return html_path
 
 
 class PDFReport(HTMLReport):

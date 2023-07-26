@@ -1,3 +1,4 @@
+import os
 import pickle
 from datetime import datetime
 from pathlib import Path
@@ -9,6 +10,13 @@ from website_checker.analyze.result import PageContextAdapter, PageEvaluation
 from website_checker.crawl.crawler import Crawler
 from website_checker.crawl.websitepage import WebsitePage
 from website_checker.report import report
+
+DEBUG = False
+if os.environ.get("DEBUG"):
+    DEBUG = True
+
+DEFAULT_OUTPUT_PATH = Path(__file__).parent.parent / "output"
+DEFAULT_PDF_OUTPUT = DEFAULT_OUTPUT_PATH / "report.pdf"
 
 
 class WebsiteChecker:
@@ -53,6 +61,10 @@ class WebsiteChecker:
         return evaluated_data
 
     def report(self, evaluated_pages: List[PageEvaluation], screenshot=None):
+        pdf_path = utils.get_desktop_path() / self.filename
+        if DEBUG:
+            pdf_path = DEFAULT_PDF_OUTPUT
+
         adapter = PageContextAdapter()
         context = adapter(evaluated_pages, screenshot)
-        return report.PDFReport().render(context, utils.get_desktop_path() / self.filename)
+        return report.PDFReport().render(context, pdf_path)
