@@ -33,4 +33,6 @@ class Analyzer:
             result = analyzer_class().check(page)
             if result:
                 page_result.add_result(result)
+                if result.tags:
+                    page_result.set_tags(result.tags)
         return page_result

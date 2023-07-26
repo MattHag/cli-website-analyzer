@@ -20,6 +20,7 @@ class PageEvaluation:
         self.title = title
         self.results = results
         self.status = None  # worst status of all results
+        self.tags: List[str] = []
 
     def add_result(self, evaluation):
         self.results.append(evaluation)
@@ -31,14 +32,21 @@ class PageEvaluation:
             entry.res = Status(entry.status).name.lower()
         self.results.sort(key=lambda x: x.title)
 
+    def set_tags(self, tags: List[str]):
+        """Shows tags for this page."""
+        self.tags = tags
+
 
 class PageContextAdapter:
     def __call__(self, evaluated_pages: List[PageEvaluation], screenshot=None) -> Dict[str, Any]:
         """Adapts analyzer results to a context for report creation."""
-        evaluated_pages.sort(key=lambda x: x.url)
+        evaluated_pages = sort_by_url(evaluated_pages)
+        sitemap_list = sort_by_url(evaluated_pages)
 
         summary = self.create_status_summary(evaluated_pages)
         descriptions = self.collect_test_descriptions(evaluated_pages)
+        common_tags = collect_common_tags(evaluated_pages)
+
         for entry in summary:
             entry["status"] = Status(entry["status"]).name
         for page in evaluated_pages:
@@ -46,8 +54,6 @@ class PageContextAdapter:
             for result in page.results:
                 result.status = Status(result.status).name.lower()
             page.results.sort(key=lambda x: x.title)
-
-        sitemap_list = sort_by_url(evaluated_pages)
 
         context = {
             "url": evaluated_pages[0].url,
@@ -60,6 +66,8 @@ class PageContextAdapter:
         if screenshot:
             screenshot_bytes = base64.b64encode(screenshot).decode()
             context.update({"screenshot": screenshot_bytes})
+        if common_tags:
+            context.update({"tags": common_tags})
         return context
 
     def collect_test_descriptions(self, evaluated_pages):
@@ -83,6 +91,17 @@ class PageContextAdapter:
                     entry["status"] = result_value
                 test_summary[result.title] = entry
         return sorted(test_summary.values(), key=lambda x: x["title"])
+
+
+def collect_common_tags(evaluated_pages: List[PageEvaluation]) -> List[str]:
+    """Collects all tags that are present on all pages."""
+    common_tags = []
+    tags = list(set([tag for page in evaluated_pages for tag in page.tags]))
+    for tag in tags:
+        if all([tag in page.tags for page in evaluated_pages]):
+            common_tags.append(tag)
+    common_tags.sort()
+    return common_tags
 
 
 def sort_by_url(objects: list):
