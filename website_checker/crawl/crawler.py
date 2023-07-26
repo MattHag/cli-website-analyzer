@@ -2,7 +2,7 @@ import bisect
 import re
 import time
 import urllib
-from typing import Any, List, Set, Union
+from typing import Any, List, Set, Tuple, Union
 from urllib.parse import ParseResult, urldefrag, urljoin, urlparse
 
 import requests
@@ -251,7 +251,7 @@ def handle_favicons(html: str, elements: List[Resource], failed_requests: List[R
         matches = re.findall(pattern, raw_html, re.I)
         return matches
 
-    def favicon_loads(icon_url: str) -> tuple[bool, Any]:
+    def favicon_loads(icon_url: str) -> Tuple[bool, Any]:
         try:
             response = requests.get(url, allow_redirects=False)
             if response.status_code == 200:
