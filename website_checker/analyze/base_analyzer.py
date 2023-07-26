@@ -4,7 +4,8 @@ from website_checker.analyze.result import Status
 
 
 class BaseAnalyzer:
-    def __init__(self):
+    def __init__(self, hidden=False):
+        self.hidden = hidden
         self.title = None
         self.description = None  # Text or HTML
         self.result = None
