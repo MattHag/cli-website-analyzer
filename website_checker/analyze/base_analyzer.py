@@ -1,3 +1,5 @@
+from typing import List, Union
+
 from website_checker.analyze.result import Status
 
 
@@ -7,6 +9,7 @@ class BaseAnalyzer:
         self.description = None  # Text or HTML
         self.result = None
         self.status = None
+        self.tags = []
 
     def check(self, page):
         """Analyzes one page of a website and sets the results."""
@@ -38,11 +41,22 @@ class BaseAnalyzer:
         if type(data) == str:
             self.result.update({"text": data})
 
-        # set status to the worst status
+        self._set_status(status)
+
+    def _set_status(self, status: Status):
+        """Updates status if new one is worse."""
         if self.status is None:
             self.status = status
         elif status.value > self.status.value:
             self.status = status
+
+    def add_tags(self, tags: Union[str, List[str]]):
+        """Adds tags to the result."""
+        if isinstance(tags, str):
+            tags = [tags]
+        if len(tags) == 0:
+            raise ValueError("No tag given.")
+        self.tags += tags
 
     @classmethod
     def __subclasshook__(cls, C):
