@@ -3,5 +3,5 @@ import abc
 
 class CrawlerBase(abc.ABC):
     @abc.abstractmethod
-    def next(self):
+    def next_page(self):
         ...

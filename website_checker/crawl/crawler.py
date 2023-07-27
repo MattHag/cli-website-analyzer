@@ -15,58 +15,6 @@ from website_checker.crawl.resource import Resource, ResourceRequest
 from website_checker.crawl.websitepage import WebsitePage
 
 
-def get_base_domain(url: str) -> str:
-    """Extracts the base domain of a given url.
-
-    Parameters
-    ----------
-    url
-        The url to gather the base domain from.
-
-    Returns
-    -------
-    str
-        The base domain of the given url.
-
-    Examples
-    --------
-    >>> get_base_domain("https://www.domain.com/")
-    'https://www.domain.com'
-    >>> get_base_domain("https://www.domain.com/path")
-    'https://www.domain.com'
-    """
-    parts = urlparse(url)
-    return urllib.parse.urlunparse(
-        ParseResult(
-            scheme=parts.scheme,
-            netloc=parts.netloc,
-            path="",
-            params="",
-            query="",
-            fragment="",
-        )
-    )
-
-
-def is_internal_link(url: str, domain: str) -> bool:
-    """Checks if url is an internal link."""
-    if url.startswith(domain):
-        len_domain = len(domain)
-        if len(url) == len_domain:
-            return True
-        if url[len_domain] == "/":
-            return True
-    return False
-
-
-def create_resource(response):
-    """Creates a resource object from a response object."""
-    url = response.url
-    headers = response.headers
-    status = response.status
-    return Resource(url, status, headers)
-
-
 class ExternalLinkException(Exception):
     def __init__(self, url):
         self.url = url
@@ -88,36 +36,35 @@ class Crawler(CrawlerBase):
         self.failed_requests: List = []
         self.screenshot_encoded: Any = None
 
-        self._p = sync_playwright().start()
-        self._browser = self._p.chromium.launch(headless=True)
         self.context: Union[None, BrowserContext] = None
 
         self._add_url(url)  # add start url
 
     def __enter__(self):
+        self.playwright = sync_playwright().start()
+        self.browser = self.playwright.chromium.launch(headless=True)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self._browser.close()
-        self._p.stop()
+        self.playwright.stop()
 
     def __iter__(self):
         return self
 
     def __next__(self):
         try:
-            return self.next()
+            return self.next_page()
         except Exception:
             raise StopIteration
 
-    def next(self) -> WebsitePage:
+    def next_page(self) -> WebsitePage:
         next_url = self.collected_links.pop(0)
         logger.info(f"Visit next: {next_url}")
         try:
             return self._next_page(next_url)
         except Exception as e:
             logger.error(f"Error while crawling: {e}")
-            return self.next()
+            return self.next_page()
 
     def _reset_data(self):
         self.responses = []
@@ -132,7 +79,7 @@ class Crawler(CrawlerBase):
 
     def _next_page(self, url: str):
         self._reset_data()
-        self.context = self._browser.new_context()  # incognito mode
+        self.context = self.browser.new_context()  # incognito mode
         try:
             page = self.context.new_page()
             self._register_hooks(page)
@@ -218,6 +165,58 @@ class Crawler(CrawlerBase):
         if not self.responses:
             download.cancel()
             raise NopageException(download.url)
+
+
+def get_base_domain(url: str) -> str:
+    """Extracts the base domain of a given url.
+
+    Parameters
+    ----------
+    url
+        The url to gather the base domain from.
+
+    Returns
+    -------
+    str
+        The base domain of the given url.
+
+    Examples
+    --------
+    >>> get_base_domain("https://www.domain.com/")
+    'https://www.domain.com'
+    >>> get_base_domain("https://www.domain.com/path")
+    'https://www.domain.com'
+    """
+    parts = urlparse(url)
+    return urllib.parse.urlunparse(
+        ParseResult(
+            scheme=parts.scheme,
+            netloc=parts.netloc,
+            path="",
+            params="",
+            query="",
+            fragment="",
+        )
+    )
+
+
+def is_internal_link(url: str, domain: str) -> bool:
+    """Checks if url is an internal link."""
+    if url.startswith(domain):
+        len_domain = len(domain)
+        if len(url) == len_domain:
+            return True
+        if url[len_domain] == "/":
+            return True
+    return False
+
+
+def create_resource(response):
+    """Creates a resource object from a response object."""
+    url = response.url
+    headers = response.headers
+    status = response.status
+    return Resource(url, status, headers)
 
 
 def normalize_url(domain: str, link: str, current_url: str) -> str:
