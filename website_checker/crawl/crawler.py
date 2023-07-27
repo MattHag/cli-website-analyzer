@@ -2,12 +2,12 @@ import bisect
 import re
 import time
 import urllib
-from typing import Any, List, Set, Tuple, Union
+from typing import Any, List, Set, Tuple
 from urllib.parse import ParseResult, urldefrag, urljoin, urlparse
 
 import requests
 from loguru import logger
-from playwright.sync_api import BrowserContext, Page, Request, Response, sync_playwright
+from playwright.sync_api import Page, Request, Response
 
 from website_checker.crawl.cookie import Cookie
 from website_checker.crawl.crawlerbase import CrawlerBase
@@ -26,7 +26,8 @@ class NopageException(Exception):
 
 
 class Crawler(CrawlerBase):
-    def __init__(self, url: str):
+    def __init__(self, browser, url: str):
+        self._browser = browser
         self.domain = get_base_domain(url)
         self.collected_links: list = []
         self.visited_links: Set = set()
@@ -36,17 +37,14 @@ class Crawler(CrawlerBase):
         self.failed_requests: List = []
         self.screenshot_encoded: Any = None
 
-        self.context: Union[None, BrowserContext] = None
-
         self._add_url(url)  # add start url
 
     def __enter__(self):
-        self.playwright = sync_playwright().start()
-        self.browser = self.playwright.chromium.launch(headless=True)
+        self._browser.__enter__()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.playwright.stop()
+        self._browser.__exit__(exc_type, exc_val, exc_tb)
 
     def __iter__(self):
         return self
@@ -79,13 +77,18 @@ class Crawler(CrawlerBase):
 
     def _next_page(self, url: str):
         self._reset_data()
-        self.context = self.browser.new_context()  # incognito mode
         try:
-            page = self.context.new_page()
-            self._register_hooks(page)
             time.sleep(1)
             self.visited_links.add(url)
-            page.goto(url, wait_until="networkidle")
+            page = self._browser.goto(
+                url,
+                hooks=(
+                    self._requestfailed_hook,
+                    self._response_hook,
+                    self._requestfinished_hook,
+                    self._download_hook,
+                ),
+            )
             current_url = page.url
             if url != current_url:
                 logger.debug(f"Redirected to: {current_url}")
@@ -110,18 +113,18 @@ class Crawler(CrawlerBase):
                 self.screenshot_encoded = page.screenshot()
 
             self._collect_links(page, current_url)
-        finally:
-            self.context.close()
 
-        return WebsitePage(
-            url=current_url,
-            title=title,
-            html=html,
-            cookies=cookies,
-            elements=elements,
-            requests=fine_requests,
-            failed_requests=failed_requests,
-        )
+            return WebsitePage(
+                url=current_url,
+                title=title,
+                html=html,
+                cookies=cookies,
+                elements=elements,
+                requests=fine_requests,
+                failed_requests=failed_requests,
+            )
+        finally:
+            self._browser.close_page()
 
     def _normalize_url(self, link, current_url):
         return normalize_url(self.domain, link, current_url)

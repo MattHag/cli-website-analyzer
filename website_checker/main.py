@@ -7,6 +7,7 @@ from typing import Any, List, Tuple
 from website_checker import utils
 from website_checker.analyze.analyzer import Analyzer
 from website_checker.analyze.result import PageContextAdapter, PageEvaluation
+from website_checker.crawl.browser import Browser
 from website_checker.crawl.crawler import Crawler
 from website_checker.crawl.websitepage import WebsitePage
 from website_checker.report import report
@@ -43,7 +44,8 @@ class WebsiteChecker:
 
     def crawl(self, url) -> Tuple[List[WebsitePage], Any]:
         pages = []
-        with Crawler(url) as crawler:
+        browser = Browser()
+        with Crawler(browser, url) as crawler:
             for idx, page in enumerate(crawler, start=1):
                 pages.append(page)
                 if self.max_pages and idx >= self.max_pages:
