@@ -8,7 +8,7 @@ from website_checker.crawl.crawler import Crawler
 
 @pytest.fixture
 def mock_crawler_next_once(page):
-    with patch.object(Crawler, "next") as mock_next:
+    with patch.object(Crawler, "next_page") as mock_next:
         mock_next.side_effect = [page]
         yield mock_next
 

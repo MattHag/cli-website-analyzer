@@ -64,7 +64,7 @@ def mock_crawler():
 
 @pytest.mark.skip(reason="Requires improved mock")
 def test_crawler(mock_crawler):
-    next_page = mock_crawler.next()
+    next_page = mock_crawler.next_page()
 
     assert next_page
 
@@ -83,7 +83,7 @@ def test_crawler_iterator(mock_crawler):
 
 @pytest.mark.skip(reason="Requires improved mock")
 def test_crawler_cookies(mock_crawler):
-    next_page = mock_crawler.next()
+    next_page = mock_crawler.next_page()
 
     assert next_page.cookies
 
