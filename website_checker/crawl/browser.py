@@ -2,7 +2,8 @@ from playwright.sync_api import Page, sync_playwright
 
 
 class Browser:
-    def __init__(self):
+    def __init__(self, headless=True):
+        self.headless = headless
         self.playwright = None
         self._browser = None
         self.page = None
@@ -27,7 +28,7 @@ class Browser:
 
     def __enter__(self):
         self.playwright = sync_playwright().start()
-        self._browser = self.playwright.chromium.launch(headless=True)
+        self._browser = self.playwright.chromium.launch(headless=self.headless)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
