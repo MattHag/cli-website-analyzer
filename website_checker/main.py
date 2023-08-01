@@ -30,6 +30,7 @@ class WebsiteChecker:
 
         self.filename = None
         self.creation_date = None
+        self.evaluation_result = None
 
     def check(self, url, current_datetime=None) -> Path:
         if current_datetime is None:
@@ -39,8 +40,8 @@ class WebsiteChecker:
         max_pages_option = f"{self.max_pages}p" if self.max_pages else "full"
         self.filename = "_".join(["Report", max_pages_option, domainname, f"{self.creation_date}.pdf"])
         crawled_pages, screenshot = self.crawl(url)
-        evaluation = self.evaluate(crawled_pages)
-        return self.report(evaluation, screenshot)
+        self.evaluation_result = self.evaluate(crawled_pages)
+        return self.report(self.evaluation_result, screenshot)
 
     def crawl(self, url) -> Tuple[List[WebsitePage], Any]:
         pages = []
