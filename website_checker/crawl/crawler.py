@@ -157,7 +157,7 @@ class Crawler(CrawlerBase):
             ]
             failed_requests = [ResourceRequest(url=req.url, failure=req.failure) for req in self.failed_requests]
 
-            handle_favicons(html, elements, failed_requests)
+            handle_favicons(self.domain, current_url, html, elements, failed_requests)
 
             if self.screenshot_encoded is None:
                 self.screenshot_encoded = page.screenshot()
@@ -243,7 +243,13 @@ def add_element_sorted_unique(lst, item):
         lst.insert(index, item)
 
 
-def handle_favicons(html: str, elements: List[Resource], failed_requests: List[ResourceRequest]):
+def handle_favicons(
+    domain: str,
+    current_url: str,
+    html: str,
+    elements: List[Resource],
+    failed_requests: List[ResourceRequest],
+):
     """Special handling for favicons as long as Playwright does not support them."""
 
     def extract_all_icon_urls(raw_html: str):
@@ -270,6 +276,7 @@ def handle_favicons(html: str, elements: List[Resource], failed_requests: List[R
 
     icon_urls = extract_all_icon_urls(html)
     for url in icon_urls:
+        url = normalize_url(domain, url, current_url)
         loads, headers = favicon_loads(url)
         if loads:
             if is_url_not_in_list(url, elements):
