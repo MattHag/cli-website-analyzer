@@ -1,3 +1,6 @@
+import pytest
+
+from website_checker.analyze.result import Status
 from website_checker.check.external_network_access import CheckExternalNetworkAccess
 from website_checker.crawl.resource import Resource, ResourceRequest
 from website_checker.crawl.websitepage import WebsitePage
@@ -19,6 +22,7 @@ def test_check_external_network_access():
 
     assert "external network access" in res.title.lower()
     assert len(res.result["list"]["entries"]) == len(external)
+    assert res.status == Status.WARNING
 
 
 def test_check_failed_external_request():
@@ -46,3 +50,23 @@ def test_check_no_external_network_access():
     res = CheckExternalNetworkAccess().check(page)
 
     assert "no external network access" in res.result["text"].lower()
+
+
+@pytest.mark.parametrize(
+    "url, expected_status",
+    [
+        ("https://cdn.local.url/static/image.jpg", Status.OK),
+        ("https://stats.local.url/static/image.jpg", Status.OK),
+        ("https://local.url.fake/static/image.jpg", Status.WARNING),
+    ],
+)
+def test_check_subdomain_allowed(url, expected_status):
+    domain = "https://local.url"
+    external_resources = [
+        Resource(url=url),
+    ]
+    page = WebsitePage(url=domain, title="Testsite", elements=external_resources, html="")
+
+    res = CheckExternalNetworkAccess().check(page)
+
+    assert res.status == expected_status
