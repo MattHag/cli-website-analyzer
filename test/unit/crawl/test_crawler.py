@@ -7,6 +7,7 @@ from website_checker.crawl.cookie import Cookie
 from website_checker.crawl.crawler import (
     Crawler,
     add_element_sorted_unique,
+    collect_links,
     get_base_domain,
     is_internal_link,
     normalize_url,
@@ -181,3 +182,13 @@ def test_add_element_sorted_unique():
     add_element_sorted_unique(data, "bbb")  # Add duplicate
 
     assert data == expected_data
+
+
+def test_collect_links():
+    domain = "https://domain.test"
+    links = {"https://domain.test", "https://domain.test/contact"}
+    visited_links = {"https://domain.test"}
+
+    res = collect_links(links, visited_links, domain)
+
+    assert res == {"https://domain.test/contact"}

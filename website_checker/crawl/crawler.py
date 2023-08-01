@@ -112,7 +112,7 @@ class Crawler(CrawlerBase):
             if self.screenshot_encoded is None:
                 self.screenshot_encoded = page.screenshot()
 
-            self._collect_links(page, current_url)
+            self._gather_new_links(page, current_url)
 
             return WebsitePage(
                 url=current_url,
@@ -126,6 +126,15 @@ class Crawler(CrawlerBase):
         finally:
             self._browser.close_page()
 
+    def _gather_new_links(self, page: Page, current_url: str):
+        css_selector = "a[href]:not([rel*='nofollow'])"
+        link_elements = page.query_selector_all(css_selector)
+        all_links_on_page = {link.get_attribute("href") for link in link_elements}
+        normalized_links = {normalize_url(self.domain, link, current_url) for link in all_links_on_page}
+        unvisited_links = collect_links(normalized_links, self.visited_links, self.domain)
+        for link in unvisited_links:
+            self._add_url(link)
+
     def _normalize_url(self, link, current_url):
         return normalize_url(self.domain, link, current_url)
 
@@ -133,25 +142,6 @@ class Crawler(CrawlerBase):
         """Adds a url to the crawler."""
         normalized_url = self._normalize_url(url, self.domain)
         add_element_sorted_unique(self.collected_links, normalized_url)
-
-    def _collect_links(self, page: Page, current_url: str):
-        """Extracts all <a href=""> links from the page."""
-        css_selector = "a[href]:not([rel*='nofollow'])"
-        link_elements = page.query_selector_all(css_selector)
-
-        links = {link.get_attribute("href") for link in link_elements}
-        links = {self._normalize_url(link, current_url) for link in links}
-
-        # remove / at end of url for comparison
-        links = {link.rstrip("/") for link in links if type(link) == str}
-        visited_links = {link.rstrip("/") for link in self.visited_links}
-        unvisited_links = links - visited_links
-
-        internal_links = {link for link in unvisited_links if type(link) == str and is_internal_link(link, self.domain)}
-        images = (".png", ".jpg", ".jpeg", ".webp", "avif")
-        unvisited_internal_pages = {link for link in internal_links if not link.endswith(images)}
-        for link in unvisited_internal_pages:
-            self._add_url(link)
 
     def _requestfailed_hook(self, request: Request):
         logger.debug(f"Request failed for: {request.url}")
@@ -168,6 +158,20 @@ class Crawler(CrawlerBase):
         if not self.responses:
             download.cancel()
             raise NopageException(download.url)
+
+
+def collect_links(links: Set[str], visited_links: Set[str], domain: str):
+    """Extracts all <a href=""> links from the page."""
+
+    # remove / at end of url for comparison
+    links = {link.rstrip("/") for link in links if type(link) == str}
+    visited_links = {link.rstrip("/") for link in visited_links}
+    unvisited_links = links - visited_links
+
+    internal_links = {link for link in unvisited_links if type(link) == str and is_internal_link(link, domain)}
+    images = (".png", ".jpg", ".jpeg", ".webp", "avif")
+    unvisited_internal_pages = {link for link in internal_links if not link.endswith(images)}
+    return unvisited_internal_pages
 
 
 def get_base_domain(url: str) -> str:
