@@ -5,7 +5,7 @@ from website_checker.analyze import base_analyzer
 from website_checker.analyze.result import Status
 
 
-def is_internal_link(url: str, domain: str) -> bool:
+def is_internal_link(url: str, domain: str, allow_subdomain=True) -> bool:
     """Checks if url is an internal link."""
     if url.startswith(domain):
         len_domain = len(domain)
@@ -13,6 +13,13 @@ def is_internal_link(url: str, domain: str) -> bool:
             return True
         if url[len_domain] == "/":
             return True
+    elif allow_subdomain:
+        parts = urlparse(url)
+        domain = domain.lstrip("http://")
+        domain = domain.lstrip("https://")
+        if parts.netloc.endswith(domain):
+            return True
+
     return False
 
 
