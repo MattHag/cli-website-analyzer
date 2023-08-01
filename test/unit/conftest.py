@@ -12,6 +12,14 @@ from website_checker.crawl.websitepage import WebsitePage
 LOG_DIR = Path(__file__).parent.parent.parent / "logs"
 
 
+@pytest.fixture
+def minimal_page():
+    yield WebsitePage(
+        url="https://domain.test",
+        title="Test page",
+    )
+
+
 @pytest.fixture(autouse=True, scope="session")
 def set_log_file_for_unit_tests():
     """Set logger output to a log file for unit tests."""
