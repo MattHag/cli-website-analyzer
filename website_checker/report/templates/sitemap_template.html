@@ -4,7 +4,7 @@
             <h2>Sitemap</h2>
             <ul class="sitemap-wrapper">
                 {%- for page in sitemap -%}
-                    <li class="sitemap-item">
+                    <li class="sitemap-item avoid-overflow">
                         <a href="{{ page.url }}" target="_blank">{{ page.url }}</a>
                         <span class="dot" data-value="{{ page.status }}"></span>
                     </li>
