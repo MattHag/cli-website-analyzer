@@ -41,7 +41,7 @@ class Browser:
             time_delta = datetime.datetime.now() - self._last_request
             if time_delta.total_seconds() < self.rate_limit:
                 sleep_time = self.rate_limit - time_delta.total_seconds()
-                logger.debug("Sleeping for %d seconds" % sleep_time)
+                logger.debug("Sleeping for %d milliseconds" % sleep_time)
                 time.sleep(sleep_time / 1000)
             self._last_request = datetime.datetime.now()
 
