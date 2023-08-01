@@ -21,10 +21,11 @@ DEFAULT_PDF_OUTPUT = DEFAULT_OUTPUT_PATH / "report.pdf"
 
 
 class WebsiteChecker:
-    def __init__(self, analyzer=None, *, max_pages=None, save_crawled_pages=False):
+    def __init__(self, analyzer=None, rate_limit=None, max_pages=None, save_crawled_pages=False):
         if analyzer is None:
             analyzer = Analyzer()
         self.analyzer = analyzer
+        self.rate_limit = rate_limit
         self.max_pages = max_pages
         self.save_crawled_pages = save_crawled_pages
 
@@ -45,7 +46,7 @@ class WebsiteChecker:
 
     def crawl(self, url) -> Tuple[List[WebsitePage], Any]:
         pages = []
-        browser = Browser()
+        browser = Browser(rate_limit=self.rate_limit)
         with Crawler(browser, url) as crawler:
             for idx, page in enumerate(crawler, start=1):
                 pages.append(page)
