@@ -26,6 +26,26 @@ def test_check_status_400_errors(status_code, expected_status, page):
         assert len(res.result["list"]["entries"]) == 1
 
 
+@pytest.mark.parametrize(
+    "nr_of_requests, expected_status",
+    [
+        (0, Status.OK),
+        (1, Status.OK),
+        (80, Status.OK),
+        (81, Status.WARNING),
+        (119, Status.WARNING),
+        (120, Status.FAILED),
+        (300, Status.FAILED),
+    ],
+)
+def test_check_requests(nr_of_requests, expected_status, page):
+    page.requests = [ResourceRequest(url="unknown_resource.jpg")] * nr_of_requests
+
+    res = CheckResourceLoadErrors().check(page)
+
+    assert res.status == expected_status
+
+
 def test_check_aborted_requests(page):
     page.failed_requests = [ResourceRequest(url="unknown_resource.jpg", failure="DNS lookup failed")]
 
