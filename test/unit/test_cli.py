@@ -23,6 +23,16 @@ def test_cli(mock_website_check):
     assert "URL is" in result.output
 
 
+def test_cli_rate_limit(mock_website_check):
+    runner = CliRunner()
+
+    result = runner.invoke(main, ['domain.url', '--rate-limit', '1500'])
+    assert result.exit_code == 0
+
+    result = runner.invoke(main, ['domain.url', '-r', '1500'])
+    assert result.exit_code == 0
+
+
 def test_cli_max_pages(mock_website_check):
     runner = CliRunner()
 
