@@ -1,5 +1,11 @@
+import os
+
 from website_checker import main
 from website_checker.analyze.analyzer import Analyzer
+
+DEBUG = False
+if os.environ.get("DEBUG"):
+    DEBUG = True
 
 
 def test_integrationtest(test_server, mock_desktop_path):
@@ -22,3 +28,6 @@ def test_integrationtest(test_server, mock_desktop_path):
     assert pdf_file.is_file()
     file_bytes = pdf_file.read_bytes()
     assert file_bytes.startswith(expected_pdf_signature)
+
+    if DEBUG:
+        pdf_file.rename(main.DEFAULT_OUTPUT_PATH / "test_integrationtest.pdf")
