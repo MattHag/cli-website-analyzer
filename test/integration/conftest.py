@@ -37,7 +37,7 @@ class MyRequestHandler(server.SimpleHTTPRequestHandler):
         if self.path == "/":
             self.path = "index.html"
         elif "." not in self.path:
-            self.path = self.path + ".html"
+            self.path = self.path.rstrip("/") + ".html"
 
         # Call the parent class's do_GET to serve the requested file
         return super().do_GET()
