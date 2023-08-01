@@ -357,3 +357,7 @@ figure img {
   background-color: var(--color-fail);
   color: var(--color-fail-light);
 }
+
+.avoid-overflow {
+  overflow-wrap: anywhere;
+}
