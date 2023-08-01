@@ -90,9 +90,10 @@ $ websiteanalyzer --help
 Usage: websiteanalyzer [OPTIONS] URL
 
 Options:
-  -p, --max-pages INTEGER  Crawl a maximum of n pages
-  -s, --save               Save the crawled pages to a file
-  -h, --help               Show this message and exit.
+  -r, --rate-limit INTEGER  Limit crawler to n milliseconds per page
+  -p, --max-pages INTEGER   Crawl a maximum of n pages
+  -s, --save                Save the crawled pages to a file
+  -h, --help                Show this message and exit.
 
 ```
 
