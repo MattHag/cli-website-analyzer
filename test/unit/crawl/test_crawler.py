@@ -1,6 +1,3 @@
-from unittest.mock import patch
-
-import playwright
 import pytest
 
 from website_checker.crawl.cookie import Cookie
@@ -52,41 +49,6 @@ def page():
         cookies=cookies(),
         elements=resources(),
     )
-
-
-@pytest.fixture
-def mock_crawler():
-    url = BASE_URL
-
-    with patch.object(playwright.sync_api.Page, "goto"):
-        with Crawler(url) as c:
-            yield c
-
-
-@pytest.mark.skip(reason="Requires improved mock")
-def test_crawler(mock_crawler):
-    next_page = mock_crawler.next_page()
-
-    assert next_page
-
-
-@pytest.mark.skip(reason="Requires improved mock")
-def test_crawler_iterator(mock_crawler):
-    result = []
-    for page in mock_crawler:
-        result.append(page)
-
-    assert result
-    for page in result:
-        assert page.created
-        assert page.html
-
-
-@pytest.mark.skip(reason="Requires improved mock")
-def test_crawler_cookies(mock_crawler):
-    next_page = mock_crawler.next_page()
-
-    assert next_page.cookies
 
 
 def test_normalize_url_absolute():
