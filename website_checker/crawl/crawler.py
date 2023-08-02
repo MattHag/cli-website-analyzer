@@ -159,6 +159,10 @@ class Crawler(CrawlerBase):
 
     def _response_hook(self, response: Response):
         self.responses.append(response)
+        # check last 5 chars
+        if response.url.endswith("/") or "." not in response.url[-5:]:
+            server_response_time = response.request.timing['responseStart'] - response.request.timing['requestStart']
+            logger.debug(f"Server response took {round(server_response_time)} ms for {response.url}")
 
     def _requestfinished_hook(self, request: Request):
         self.requests.append(request)
