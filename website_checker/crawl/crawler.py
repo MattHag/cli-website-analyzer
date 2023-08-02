@@ -1,6 +1,5 @@
 import bisect
 import re
-import time
 import urllib
 from typing import Any, List, Set, Tuple
 from urllib.parse import ParseResult, urldefrag, urljoin, urlparse
@@ -78,7 +77,6 @@ class Crawler(CrawlerBase):
     def _next_page(self, url: str):
         self._reset_data()
         try:
-            time.sleep(1)
             self.visited_links.add(url)
             page = self._browser.goto(
                 url,
