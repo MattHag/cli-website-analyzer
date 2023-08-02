@@ -28,7 +28,7 @@ class Analyzer:
 
     def run_checks(self, page: WebsitePage):
         """Collects analyzer results for a single page."""
-        page_result = PageEvaluation(url=page.url, title=page.title)
+        page_result = PageEvaluation(url=page.url, title=page.title, screenshot=page.screenshot)
         for analyzer_class in self.__class__.registry.values():
             result = analyzer_class().check(page)
             if result:

@@ -13,7 +13,7 @@ class Status(Enum):
 class PageEvaluation:
     """Represents the analyzer results for a single URL."""
 
-    def __init__(self, url: str, title: str, results=None):
+    def __init__(self, url: str, title: str, results=None, screenshot: Any = None):
         if results is None:
             results = []
         self.url = url
@@ -21,6 +21,7 @@ class PageEvaluation:
         self.results = results
         self.status = None  # worst status of all results
         self.tags: List[str] = []
+        self.screenshot = screenshot
 
     def add_result(self, evaluation):
         self.results.append(evaluation)
@@ -38,8 +39,10 @@ class PageEvaluation:
 
 
 class PageContextAdapter:
-    def __call__(self, evaluated_pages: List[PageEvaluation], screenshot=None) -> Dict[str, Any]:
+    def __call__(self, evaluated_pages: List[PageEvaluation]) -> Dict[str, Any]:
         """Adapts analyzer results to a context for report creation."""
+        if not evaluated_pages:
+            raise ValueError("No pages to evaluate.")
         evaluated_pages = sort_by_url(evaluated_pages)
         sitemap_list = sort_by_url(evaluated_pages)
 
@@ -55,16 +58,17 @@ class PageContextAdapter:
                 result.status = Status(result.status).name.lower()
             page.results.sort(key=lambda x: x.title)
 
+        first_page = evaluated_pages[0]
         context = {
-            "url": evaluated_pages[0].url,
+            "url": first_page.url,
             "creation_date": datetime.now().strftime("%d.%m.%Y %H:%M"),
             "summary": summary,
             "sitemap": sitemap_list,
             "pages": evaluated_pages,
             "descriptions": descriptions,
         }
-        if screenshot:
-            screenshot_bytes = base64.b64encode(screenshot).decode()
+        if first_page.screenshot:
+            screenshot_bytes = base64.b64encode(first_page.screenshot).decode()
             context.update({"screenshot": screenshot_bytes})
         if common_tags:
             context.update({"tags": common_tags})
