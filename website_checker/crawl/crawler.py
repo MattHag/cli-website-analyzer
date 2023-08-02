@@ -137,7 +137,7 @@ class Crawler(CrawlerBase):
                 raise VisitedPageException(current_url)
 
     def _gather_new_links(self, page: Page, current_url: str):
-        css_selector = "a[href]:not([rel*='nofollow'])"
+        css_selector = "a[href]:not([rel*='nofollow']):not([href^='mailto:']):not([href^='tel:'])"
         link_elements = page.query_selector_all(css_selector)
         all_links_on_page = {link.get_attribute("href") for link in link_elements}
         normalized_links = {normalize_url(self.domain, link, current_url) for link in all_links_on_page}
