@@ -15,10 +15,12 @@ def test_integrationtest(test_server, mock_desktop_path):
     analyzer = Analyzer()
     website_checker = main.WebsiteChecker(analyzer)
     pdf_file = website_checker.check(url, current_datetime=None)
-
     page_evaluations = website_checker.evaluation_result
+
+    assert len(page_evaluations) == 2
     first_page = page_evaluations[0]
 
+    assert all(page.screenshot is not None for page in page_evaluations)
     assert all(page.status == "ok" for page in page_evaluations)
     for test in first_page.results:
         if "total page size" in test.title.lower():

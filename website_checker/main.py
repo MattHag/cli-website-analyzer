@@ -2,7 +2,7 @@ import os
 import pickle
 from datetime import datetime
 from pathlib import Path
-from typing import Any, List, Tuple
+from typing import List
 
 from website_checker import utils
 from website_checker.analyze.analyzer import Analyzer
@@ -40,11 +40,11 @@ class WebsiteChecker:
         domainname = utils.get_domain_as_text(url)
         max_pages_option = f"{self.max_pages}p" if self.max_pages else "full"
         self.filename = "_".join(["Report", max_pages_option, domainname, f"{self.creation_date}.pdf"])
-        crawled_pages, screenshot = self.crawl(url)
+        crawled_pages = self.crawl(url)
         self.evaluation_result = self.evaluate(crawled_pages)
-        return self.report(self.evaluation_result, screenshot)
+        return self.report(self.evaluation_result)
 
-    def crawl(self, url) -> Tuple[List[WebsitePage], Any]:
+    def crawl(self, url) -> List[WebsitePage]:
         pages = []
         browser = Browser(rate_limit=self.rate_limit)
         with Crawler(browser, url) as crawler:
@@ -52,10 +52,9 @@ class WebsiteChecker:
                 pages.append(page)
                 if self.max_pages and idx >= self.max_pages:
                     break
-            screenshot_buffer = crawler.screenshot_encoded
         if self.save_crawled_pages:
             pickle.dump(pages, open(utils.get_desktop_path() / "pages.p", "wb"))
-        return pages, screenshot_buffer
+        return pages
 
     def evaluate(self, pages: List[WebsitePage]) -> List[PageEvaluation]:
         evaluated_data = []
@@ -64,11 +63,11 @@ class WebsiteChecker:
             evaluated_data.append(eval_result)
         return evaluated_data
 
-    def report(self, evaluated_pages: List[PageEvaluation], screenshot=None):
+    def report(self, evaluated_pages: List[PageEvaluation]):
         pdf_path = utils.get_desktop_path() / self.filename
         if DEBUG:
             pdf_path = DEFAULT_PDF_OUTPUT
 
         adapter = PageContextAdapter()
-        context = adapter(evaluated_pages, screenshot)
+        context = adapter(evaluated_pages)
         return report.PDFReport().render(context, pdf_path)

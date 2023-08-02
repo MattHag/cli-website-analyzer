@@ -4,7 +4,17 @@ from website_checker.crawl.cookie import Cookie
 
 
 class WebsitePage:
-    def __init__(self, url="", title="", html="", cookies=None, elements=None, requests=None, failed_requests=None):
+    def __init__(
+        self,
+        url="",
+        title="",
+        html="",
+        cookies=None,
+        elements=None,
+        requests=None,
+        failed_requests=None,
+        screenshot=None,
+    ):
         if elements is None:
             elements = []
         if cookies is None:
@@ -21,6 +31,7 @@ class WebsitePage:
         self.requests = requests
         self.failed_requests = failed_requests
         self.created = datetime.now()
+        self.screenshot = screenshot
 
     def add_cookie(self, cookie: Cookie):
         self.cookies.append(cookie)

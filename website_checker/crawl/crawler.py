@@ -41,7 +41,7 @@ class Crawler(CrawlerBase):
         self.responses: List = []
         self.requests: List = []
         self.failed_requests: List = []
-        self.screenshot_encoded: Any = None
+        self.screenshot: Any = None
 
         self._add_url(url)  # add start url
 
@@ -109,9 +109,7 @@ class Crawler(CrawlerBase):
             failed_requests = [ResourceRequest(url=req.url, failure=req.failure) for req in self.failed_requests]
 
             handle_favicons(self.domain, current_url, html, elements, failed_requests)
-
-            if self.screenshot_encoded is None:
-                self.screenshot_encoded = page.screenshot()
+            screenshot_encoded = page.screenshot()
 
             self._gather_new_links(page, current_url)
 
@@ -123,6 +121,7 @@ class Crawler(CrawlerBase):
                 elements=elements,
                 requests=fine_requests,
                 failed_requests=failed_requests,
+                screenshot=screenshot_encoded,
             )
         finally:
             self._browser.close_page()
