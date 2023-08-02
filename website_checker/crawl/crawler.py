@@ -14,14 +14,21 @@ from website_checker.crawl.resource import Resource, ResourceRequest
 from website_checker.crawl.websitepage import WebsitePage
 
 
-class ExternalLinkException(Exception):
+class CrawlerException(Exception):
     def __init__(self, url):
         self.url = url
 
 
-class NopageException(Exception):
-    def __init__(self, url):
-        self.url = url
+class ExternalLinkException(CrawlerException):
+    pass
+
+
+class VisitedPageException(CrawlerException):
+    pass
+
+
+class NoPageException(CrawlerException):
+    pass
 
 
 class Crawler(CrawlerBase):
@@ -59,8 +66,8 @@ class Crawler(CrawlerBase):
         logger.info(f"Visit next: {next_url}")
         try:
             return self._next_page(next_url)
-        except Exception as e:
-            logger.error(f"Error while crawling: {e}")
+        except CrawlerException as e:
+            logger.debug(f"Link skipped: {e}")
             return self.next_page()
 
     def _reset_data(self):
@@ -77,7 +84,6 @@ class Crawler(CrawlerBase):
     def _next_page(self, url: str):
         self._reset_data()
         try:
-            self.visited_links.add(url)
             page = self._browser.goto(
                 url,
                 hooks=(
@@ -88,11 +94,8 @@ class Crawler(CrawlerBase):
                 ),
             )
             current_url = page.url
-            if url != current_url:
-                logger.debug(f"Redirected to: {current_url}")
-                if not is_internal_link(current_url, self.domain):
-                    logger.debug(f"Skip external page: {current_url}")
-                    raise ExternalLinkException(current_url)
+            self._check_redirects(url, current_url)
+            self.visited_links.add(url)
             self.visited_links.add(current_url)
 
             html = page.content()
@@ -124,12 +127,22 @@ class Crawler(CrawlerBase):
         finally:
             self._browser.close_page()
 
+    def _check_redirects(self, set_url, current_url):
+        if set_url.lstrip("/") != current_url.lstrip("/"):
+            logger.debug(f"Redirected to {current_url}")
+            if not is_internal_link(current_url, self.domain):
+                logger.debug(f"Skip link to external page: {current_url}")
+                raise ExternalLinkException(current_url)
+            elif link_already_visited(current_url, self.visited_links):
+                logger.debug(f"Skip already visited page: {current_url}")
+                raise VisitedPageException(current_url)
+
     def _gather_new_links(self, page: Page, current_url: str):
         css_selector = "a[href]:not([rel*='nofollow'])"
         link_elements = page.query_selector_all(css_selector)
         all_links_on_page = {link.get_attribute("href") for link in link_elements}
         normalized_links = {normalize_url(self.domain, link, current_url) for link in all_links_on_page}
-        unvisited_links = collect_links(normalized_links, self.visited_links, self.domain)
+        unvisited_links = get_unvisited_links(normalized_links, self.visited_links, self.domain)
         for link in unvisited_links:
             self._add_url(link)
 
@@ -155,13 +168,18 @@ class Crawler(CrawlerBase):
         logger.debug(f"Download appeared: {download.url}")
         if not self.responses:
             download.cancel()
-            raise NopageException(download.url)
+            raise NoPageException(download.url)
 
 
-def collect_links(links: Set[str], visited_links: Set[str], domain: str):
-    """Extracts all <a href=""> links from the page."""
+def link_already_visited(url: str, visited_links: Set[str]):
+    """Checks if a link is already visited."""
+    link = {url.rstrip("/")}
+    visited_links = {link.rstrip("/") for link in visited_links}
+    return not bool(link - visited_links)
 
-    # remove / at end of url for comparison
+
+def get_unvisited_links(links: Set[str], visited_links: Set[str], domain: str) -> Set[str]:
+    """Returns a set of unvisited internal pages."""
     links = {link.rstrip("/") for link in links if type(link) == str}
     visited_links = {link.rstrip("/") for link in visited_links}
     unvisited_links = links - visited_links
