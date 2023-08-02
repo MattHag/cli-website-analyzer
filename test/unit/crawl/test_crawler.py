@@ -2,11 +2,11 @@ import pytest
 
 from website_checker.crawl.cookie import Cookie
 from website_checker.crawl.crawler import (
-    Crawler,
     add_element_sorted_unique,
-    collect_links,
     get_base_domain,
+    get_unvisited_links,
     is_internal_link,
+    link_already_visited,
     normalize_url,
 )
 from website_checker.crawl.resource import Resource
@@ -151,6 +151,22 @@ def test_collect_links():
     links = {"https://domain.test", "https://domain.test/contact"}
     visited_links = {"https://domain.test"}
 
-    res = collect_links(links, visited_links, domain)
+    res = get_unvisited_links(links, visited_links, domain)
 
     assert res == {"https://domain.test/contact"}
+
+
+@pytest.mark.parametrize(
+    "current_url, visited_links, expected_result",
+    [
+        ("https://domain.test", {"https://domain.test"}, True),
+        ("https://domain.test/", {"https://domain.test"}, True),
+        ("https://domain.test", {"https://domain.test/"}, True),
+        ("https://domain.test/contact/", {"https://domain.test/dummy", "https://domain.test/contact"}, True),
+        ("https://domain.test/info/", {"https://domain.test/dummy", "https://domain.test/contact"}, False),
+    ],
+)
+def test_link_already_visited(current_url, visited_links, expected_result):
+    res = link_already_visited(current_url, visited_links)
+
+    assert res == expected_result
