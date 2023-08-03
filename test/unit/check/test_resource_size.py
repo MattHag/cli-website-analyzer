@@ -1,7 +1,11 @@
 import pytest
 
 from website_checker.analyze.result import Status
-from website_checker.check.resource_size import CheckResourceSize
+from website_checker.check.resource_size import (
+    CONTENT_TYPES_CATEGORIZED,
+    CheckResourceSize,
+    resource_size_per_category,
+)
 from website_checker.crawl.resource import ResourceRequest
 
 
@@ -56,3 +60,11 @@ def test_check_total_page_size(nr_requests, expected_status, page):
 
     if expected_status == Status.OK:
         assert "good" in res.result["text"].lower()
+
+
+def test_resource_size_per_category(page):
+    res = resource_size_per_category(page)
+    total_size = sum([size for size, _ in res.values()])
+
+    assert total_size > 0
+    assert len(res) == len(CONTENT_TYPES_CATEGORIZED)
