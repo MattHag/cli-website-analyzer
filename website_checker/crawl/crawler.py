@@ -102,13 +102,8 @@ class Crawler(CrawlerBase):
             title = page.title()
             temp_cookies = page.context.cookies()
             cookies = [Cookie(name=cookie["name"]) for cookie in temp_cookies]
-            elements = [create_resource(response) for response in self.responses]
-            fine_requests = [
-                ResourceRequest(url=req.url, sizes=req.sizes()) for req in self.requests if not req.failure
-            ]
-            failed_requests = [ResourceRequest(url=req.url, failure=req.failure) for req in self.failed_requests]
-
-            handle_favicons(self.domain, current_url, html, elements, failed_requests)
+            loaded_resources, failed_requests, fine_requests = self._handle_recorded_requests()
+            handle_favicons(self.domain, current_url, html, loaded_resources, failed_requests)
             screenshot_encoded = page.screenshot()
 
             self._gather_new_links(page, current_url)
@@ -118,13 +113,23 @@ class Crawler(CrawlerBase):
                 title=title,
                 html=html,
                 cookies=cookies,
-                elements=elements,
+                elements=loaded_resources,
                 requests=fine_requests,
                 failed_requests=failed_requests,
                 screenshot=screenshot_encoded,
             )
         finally:
             self._browser.close_page()
+
+    def _handle_recorded_requests(self) -> Tuple[List[Resource], List[ResourceRequest], List[ResourceRequest]]:
+        loaded_resources = []
+        for resp in self.responses:
+            res_request = ResourceRequest(url=resp.request.url, sizes=resp.request.sizes())
+            res = Resource(resp.request.url, resp.status, resp.headers, request=res_request)
+            loaded_resources.append(res)
+        fine_requests = [ResourceRequest(url=req.url, sizes=req.sizes()) for req in self.requests if not req.failure]
+        failed_requests = [ResourceRequest(url=req.url, failure=req.failure) for req in self.failed_requests]
+        return loaded_resources, failed_requests, fine_requests
 
     def _check_redirects(self, set_url, current_url):
         if set_url.lstrip("/") != current_url.lstrip("/"):

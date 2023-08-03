@@ -7,7 +7,8 @@ class ResourceRequest:
 
 
 class Resource:
-    def __init__(self, url, status_code=None, headers=None):
+    def __init__(self, url, status_code=None, headers=None, request=None):
         self.url = url
         self.status_code = status_code
         self.headers = headers  # content-length, content-type
+        self.request = request
