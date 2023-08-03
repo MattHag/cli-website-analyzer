@@ -5,6 +5,7 @@ import pytest
 
 from website_checker.analyze.analyzer import Analyzer
 from website_checker.analyze.base_analyzer import BaseAnalyzer
+from website_checker.analyze.result import Status
 
 
 class InvalidClass(metaclass=abc.ABCMeta):
@@ -71,3 +72,20 @@ def test_base_analyzer_save_result_text(input, expected_result):
     analyzer.save_result(input, mock.Mock())
 
     assert analyzer.result == expected_result
+
+
+def test_base_analyzer_save_status():
+    analyzer = AnalyzerTest()
+
+    analyzer.save_result(mock.Mock(), Status.OK)
+
+    assert analyzer.status == Status.OK
+
+    analyzer.save_result(mock.Mock(), Status.WARNING)
+    analyzer.save_result(mock.Mock(), Status.OK)
+
+    assert analyzer.status == Status.WARNING
+
+    analyzer.save_result(mock.Mock(), Status.FAILED)
+
+    assert analyzer.status == Status.FAILED

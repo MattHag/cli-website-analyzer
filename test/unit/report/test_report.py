@@ -65,7 +65,9 @@ def test_adapter(eval_pages):
     adapter = PageContextAdapter()
     context = adapter(eval_pages)
 
-    assert len(context["pages"][0].results) == 2
+    assert len(context.pages[0].results) == 2
+    assert type(context.pages[0].results[0].status) == str
+    assert type(context.summary[0].status) == str
 
 
 def test_html_report_using_adapter(tmp_file, eval_pages):

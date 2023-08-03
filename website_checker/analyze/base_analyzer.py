@@ -48,7 +48,7 @@ class BaseAnalyzer:
         """Updates status if new one is worse."""
         if self.status is None:
             self.status = status
-        elif status.value > self.status.value:
+        elif status > self.status:
             self.status = status
 
     def add_tags(self, tags: Union[str, List[str]]):
