@@ -2,6 +2,7 @@ import os
 
 from website_checker import main
 from website_checker.analyze.analyzer import Analyzer
+from website_checker.analyze.result import Status
 
 DEBUG = False
 if os.environ.get("DEBUG"):
@@ -21,7 +22,7 @@ def test_integrationtest(test_server, mock_desktop_path):
     first_page = page_evaluations[0]
 
     assert all(page.screenshot is not None for page in page_evaluations)
-    assert all(page.status == "ok" for page in page_evaluations)
+    assert all(page.status == Status.OK for page in page_evaluations)
     for test in first_page.results:
         if "total page size" in test.title.lower():
             assert " 0.0 " not in test.result["text"]

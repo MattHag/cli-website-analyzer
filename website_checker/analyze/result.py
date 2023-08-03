@@ -1,13 +1,16 @@
 import base64
 from datetime import datetime
-from enum import Enum
+from enum import IntEnum
 from typing import Any, Dict, List
 
 
-class Status(Enum):
+class Status(IntEnum):
     OK = 1
     WARNING = 2
     FAILED = 3
+
+    def __str__(self):
+        return self.name.lower()
 
 
 class PageEvaluation:
@@ -26,16 +29,19 @@ class PageEvaluation:
     def add_result(self, evaluation):
         self.results.append(evaluation)
 
+    def set_tags(self, tags: List[str]):
+        """Shows tags for this page."""
+        self.tags = tags
+
+    def evaluate(self):
+        self.update_status()
+        self.results.sort(key=lambda x: x.title)
+
     def update_status(self):
         worst_status = sorted(self.results, key=lambda x: x.status.value, reverse=True)[0]
         self.status = Status(worst_status.status).name.lower()
         for entry in self.results:
             entry.res = Status(entry.status).name.lower()
-        self.results.sort(key=lambda x: x.title)
-
-    def set_tags(self, tags: List[str]):
-        """Shows tags for this page."""
-        self.tags = tags
 
 
 class PageContextAdapter:
@@ -53,10 +59,7 @@ class PageContextAdapter:
         for entry in summary:
             entry["status"] = Status(entry["status"]).name
         for page in evaluated_pages:
-            page.update_status()
-            for result in page.results:
-                result.status = Status(result.status).name.lower()
-            page.results.sort(key=lambda x: x.title)
+            page.evaluate()
 
         first_page = evaluated_pages[0]
         context = {
