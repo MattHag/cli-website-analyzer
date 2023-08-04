@@ -14,9 +14,7 @@ def test_integrationtest(test_server, mock_desktop_path):
     expected_pdf_signature = b"%PDF"
 
     analyzer = Analyzer()
-    website_checker = main.WebsiteChecker(analyzer)
-    pdf_file = website_checker.check(url, current_datetime=None)
-    page_evaluations = website_checker.evaluation_result
+    pdf_file, page_evaluations, _ = main.run_full_analysis(url, analyzer)
 
     assert len(page_evaluations) == 2
     first_page = page_evaluations[0]
