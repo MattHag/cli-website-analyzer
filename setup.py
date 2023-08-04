@@ -22,11 +22,7 @@ def read(*paths, **kwargs):
 
 
 def read_requirements(path):
-    return [
-        line.strip()
-        for line in read(path).split("\n")
-        if not line.startswith(('"', "#", "-", "git+"))
-    ]
+    return [line.strip() for line in read(path).split("\n") if not line.startswith(('"', "#", "-", "git+"))]
 
 
 setuptools.setup(
@@ -55,8 +51,6 @@ setuptools.setup(
     ],
     install_requires=read_requirements("requirements.txt"),
     extras_require={"dev": read_requirements("requirements-dev.txt")},
-    entry_points={
-        "console_scripts": ["websiteanalyzer = website_checker.__main__:main"]
-    },
-    python_requires=">=3.7, <4",
+    entry_points={"console_scripts": ["websiteanalyzer = website_checker.__main__:main"]},
+    python_requires=">=3.8, <4",
 )
