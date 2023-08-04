@@ -2,23 +2,26 @@ import contextlib
 import shutil
 import tempfile
 from pathlib import Path
+from typing import Protocol
 from typing import Union
 
 from jinja2 import Environment, FileSystemLoader
 from playwright.async_api import PdfMargins
 from playwright.sync_api import sync_playwright
 
-from website_checker.report.report_data import ReportData
+class SupportsToDict(Protocol):
+    def to_dict(self) -> dict:
+        ...
 
 
-def build_html(html_template: Union[str, Path], context: ReportData, path: Union[None, str, Path] = None) -> str:
+def build_html(html_template: Union[str, Path], context: SupportsToDict, path: Union[None, str, Path] = None) -> str:
     """Converts HTML to PDF.
 
     Parameters
     ----------
     html_template
         The HTML template file with Jinja2 variables.
-    context: ReportData
+    context: SupportsToDict
         The context to render the HTML template with.
     path
         The path to save the rendered HTML file to. If not given, the HTML is not written to a file.
