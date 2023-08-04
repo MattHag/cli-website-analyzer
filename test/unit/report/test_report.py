@@ -49,16 +49,16 @@ def adapted_context(eval_pages):
 
 def test_html_report_jinja(tmp_file, adapted_context):
     output_file = tmp_file
-    report.HTMLReport().render(adapted_context, output_file)
+    html_file = report.HTMLReport().render(adapted_context, output_file)
 
-    assert output_file.exists()
+    assert html_file.exists()
 
 
 def test_pdf_report_jinja(tmp_file, adapted_context):
     output_file = tmp_file
-    report.PDFReport().render(adapted_context, output_file)
+    pdf_file = report.PDFReport().render(adapted_context, output_file)
 
-    assert output_file.exists()
+    assert pdf_file.exists()
 
 
 def test_adapter(eval_pages):
@@ -73,9 +73,9 @@ def test_html_report_using_adapter(tmp_file, eval_pages):
 
     adapter = PageContextAdapter()
     context = adapter(eval_pages)
-    report.HTMLReport().render(context, output_file)
+    html_file = report.HTMLReport().render(context, output_file)
 
-    assert output_file.exists()
+    assert html_file.exists()
 
 
 def test_pdf_report_using_adapter(tmp_file, eval_pages):
@@ -83,9 +83,9 @@ def test_pdf_report_using_adapter(tmp_file, eval_pages):
 
     adapter = PageContextAdapter()
     context = adapter(eval_pages)
-    report.PDFReport().render(context, output_file)
+    pdf_file = report.PDFReport().render(context, output_file)
 
-    assert output_file.exists()
+    assert pdf_file.exists()
 
 
 class URLObject:
