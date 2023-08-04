@@ -4,6 +4,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 
 from website_checker.analyze import result
+from website_checker.analyze.base_analyzer import Result
 from website_checker.analyze.result import PageContextAdapter, PageEvaluation, Status
 from website_checker.report import report
 
@@ -18,12 +19,13 @@ def tmp_file(tmp_path):
     file.close()
 
 
-class Result:
-    def __init__(self, title="Test Result"):
-        self.title = title
-        self.description = "This is a test result"
-        self.result = {"list": {"entries": ["_ga", "_gid"]}}
-        self.status = Status.WARNING
+def create_result(title="Test Result"):
+    return Result(
+        title=title,
+        description="This is a test result",
+        result={"list": {"entries": ["_ga", "_gid"]}},
+        status=Status.WARNING,
+    )
 
 
 def page(title="Example", results=None):
@@ -38,7 +40,7 @@ def page(title="Example", results=None):
 
 @pytest.fixture
 def eval_pages():
-    return [page(results=[Result(), Result()])]
+    return [page(results=[create_result(), create_result()])]
 
 
 @pytest.fixture
@@ -66,8 +68,8 @@ def test_adapter(eval_pages):
     context = adapter(eval_pages)
 
     assert len(context.pages[0].results) == 2
-    assert type(context.pages[0].results[0].status) == str
-    assert type(context.summary[0].status) == str
+    assert type(context.pages[0].results[0].status) == Status
+    assert type(context.summary[0].status) == Status
 
 
 def test_html_report_using_adapter(tmp_file, eval_pages):
