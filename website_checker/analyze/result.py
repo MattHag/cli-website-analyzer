@@ -1,7 +1,11 @@
 import base64
-from datetime import datetime
+from dataclasses import dataclass
 from enum import IntEnum
-from typing import Any, Dict, List
+from typing import Any, List
+
+from website_checker.analyze.result_data import StatusSummary
+from website_checker.analyze.result_data import TestDescription
+from website_checker.report.report_data import ReportData
 
 
 class Status(IntEnum):
@@ -11,6 +15,14 @@ class Status(IntEnum):
 
     def __str__(self):
         return self.name.lower()
+
+
+@dataclass
+class Result:
+    title: str
+    description: str
+    result: dict
+    status: Status
 
 
 class PageEvaluation:
@@ -26,78 +38,75 @@ class PageEvaluation:
         self.tags: List[str] = []
         self.screenshot = screenshot
 
-    def add_result(self, evaluation):
+    def add_result(self, evaluation: Result):
         self.results.append(evaluation)
+        self.results.sort(key=lambda x: x.title)
 
     def set_tags(self, tags: List[str]):
         """Shows tags for this page."""
         self.tags = tags
 
-    def evaluate(self):
-        self.update_status()
-        self.results.sort(key=lambda x: x.title)
-
-    def update_status(self):
-        worst_status = sorted(self.results, key=lambda x: x.status.value, reverse=True)[0]
-        self.status = Status(worst_status.status).name.lower()
-        for entry in self.results:
-            entry.res = Status(entry.status).name.lower()
+    def update_page_status(self):
+        """Updates status of page to the worst status of all results."""
+        self.status = sorted(self.results, key=lambda x: x.status, reverse=True)[0].status
 
 
 class PageContextAdapter:
-    def __call__(self, evaluated_pages: List[PageEvaluation]) -> Dict[str, Any]:
+    def __call__(self, eval_pages: List[PageEvaluation]) -> ReportData:
         """Adapts analyzer results to a context for report creation."""
-        if not evaluated_pages:
+        if not eval_pages:
             raise ValueError("No pages to evaluate.")
-        evaluated_pages = sort_by_url(evaluated_pages)
-        sitemap_list = sort_by_url(evaluated_pages)
+        eval_pages = sort_by_url(eval_pages)
+        sitemap_list = sort_by_url(eval_pages)
 
-        summary = self.create_status_summary(evaluated_pages)
-        descriptions = self.collect_test_descriptions(evaluated_pages)
-        common_tags = collect_common_tags(evaluated_pages)
+        for page in eval_pages:
+            page.update_page_status()
 
-        for entry in summary:
-            entry["status"] = Status(entry["status"]).name
-        for page in evaluated_pages:
-            page.evaluate()
+        summary = create_status_summary(eval_pages)
+        descriptions = collect_test_descriptions(eval_pages)
+        common_tags = collect_common_tags(eval_pages)
 
-        first_page = evaluated_pages[0]
-        context = {
-            "url": first_page.url,
-            "creation_date": datetime.now().strftime("%d.%m.%Y %H:%M"),
-            "summary": summary,
-            "sitemap": sitemap_list,
-            "pages": evaluated_pages,
-            "descriptions": descriptions,
-        }
+        first_page = eval_pages[0]
+        report_data = ReportData(
+            url=first_page.url,
+            summary=summary,
+            sitemap=sitemap_list,
+            pages=eval_pages,
+            descriptions=descriptions,
+        )
         if first_page.screenshot:
             screenshot_bytes = base64.b64encode(first_page.screenshot).decode()
-            context.update({"screenshot": screenshot_bytes})
+            report_data.screenshot = screenshot_bytes
         if common_tags:
-            context.update({"tags": common_tags})
-        return context
+            report_data.tags = common_tags
+        return report_data
 
-    def collect_test_descriptions(self, evaluated_pages):
-        descriptions = {}
-        for page in evaluated_pages:
-            for result in page.results:
-                if result.description:
-                    descriptions[result.title] = result.description
-        return sorted(descriptions.items(), key=lambda x: x[0])
 
-    def create_status_summary(self, evaluated_pages):
-        test_summary = {}
-        for page in evaluated_pages:
-            for result in page.results:
-                entry = test_summary.get(
-                    result.title,
-                    {"title": result.title, "status": result.status.value},
-                )
-                result_value = result.status.value
-                if result_value > entry["status"]:
-                    entry["status"] = result_value
-                test_summary[result.title] = entry
-        return sorted(test_summary.values(), key=lambda x: x["title"])
+def collect_test_descriptions(evaluated_pages: List[PageEvaluation]) -> List[TestDescription]:
+    """Returns unique tests and their descriptions."""
+    descriptions = {}
+    for page in evaluated_pages:
+        for result in page.results:
+            if result.description:
+                descriptions[result.title] = result.description
+
+    res = []
+    for title, description in descriptions.items():
+        res.append(TestDescription(title=title, description=description))
+    return sorted(res, key=lambda x: x.title)
+
+
+def create_status_summary(evaluated_pages: List[PageEvaluation]) -> List[StatusSummary]:
+    """Generates a summary with the worst status of each test type."""
+    test_summary: dict = {}
+    for page in evaluated_pages:
+        for result in page.results:
+            default_value = StatusSummary(title=result.title, status=result.status)
+            entry = test_summary.get(result.title, default_value)
+            if result.status > entry.status:
+                entry.status = result.status
+            test_summary[result.title] = entry
+    return sorted(test_summary.values(), key=lambda x: x.title)
 
 
 def collect_common_tags(evaluated_pages: List[PageEvaluation]) -> List[str]:
