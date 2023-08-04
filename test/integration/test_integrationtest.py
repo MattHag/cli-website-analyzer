@@ -2,7 +2,7 @@ import os
 
 from website_checker import main
 from website_checker.analyze.analyzer import Analyzer
-from website_checker.analyze.result import Status
+from website_checker.analyze.result import Status, adapter
 
 DEBUG = False
 if os.environ.get("DEBUG"):
@@ -14,7 +14,7 @@ def test_integrationtest(test_server, mock_desktop_path):
     expected_pdf_signature = b"%PDF"
 
     analyzer = Analyzer()
-    pdf_file, page_evaluations, _ = main.run_full_analysis(url, analyzer)
+    pdf_file, page_evaluations, _ = main.run_full_analysis(url, analyzer, adapter)
 
     assert len(page_evaluations) == 2
     first_page = page_evaluations[0]

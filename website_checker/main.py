@@ -2,17 +2,15 @@ import os
 import pickle
 from datetime import datetime
 from pathlib import Path
-from typing import List
-from typing import Protocol
-from typing import Tuple
+from typing import Callable, List, Protocol, Tuple
 
 from website_checker import utils
-from website_checker.analyze.result import PageContextAdapter
 from website_checker.analyze.result import PageEvaluation
 from website_checker.crawl.browser import Browser
 from website_checker.crawl.crawler import Crawler
 from website_checker.crawl.websitepage import WebsitePage
 from website_checker.report import report as report_util
+from website_checker.report.report_data import ReportData
 
 DEBUG = False
 if os.environ.get("DEBUG"):
@@ -30,6 +28,7 @@ class SupportsRunChecks(Protocol):
 def run_full_analysis(
     url,
     analyzer: SupportsRunChecks,
+    converter: Callable[[List[PageEvaluation]], ReportData],
     rate_limit=None,
     max_pages=None,
     save_crawled_pages=False,
@@ -48,7 +47,7 @@ def run_full_analysis(
     evaluation_result = evaluate(analyzer, crawled_pages)
 
     report_filename = "_".join(["Report", max_pages_option, domainname, f"{creation_datetime}.pdf"])
-    pdf_path = report(report_filename, evaluation_result)
+    pdf_path = report(report_filename, evaluation_result, converter)
     return pdf_path, evaluation_result, crawled_pages
 
 
@@ -73,13 +72,12 @@ def evaluate(analyzer: SupportsRunChecks, pages: List[WebsitePage]) -> List[Page
     return evaluated_data
 
 
-def report(filename, evaluated_pages: List[PageEvaluation]):
+def report(filename, evaluated_pages: List[PageEvaluation], converter: Callable):
     pdf_path = utils.get_desktop_path() / filename
     if DEBUG:
         pdf_path = DEFAULT_PDF_OUTPUT
 
-    adapter = PageContextAdapter()
-    context = adapter(evaluated_pages)
+    context = converter(evaluated_pages)
     return report_util.PDFReport().render(context, pdf_path)
 
 

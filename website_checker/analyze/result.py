@@ -3,8 +3,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import Any, List
 
-from website_checker.analyze.result_data import StatusSummary
-from website_checker.analyze.result_data import TestDescription
+from website_checker.analyze.result_data import StatusSummary, TestDescription
 from website_checker.report.report_data import ReportData
 
 
@@ -51,35 +50,34 @@ class PageEvaluation:
         self.status = sorted(self.results, key=lambda x: x.status, reverse=True)[0].status
 
 
-class PageContextAdapter:
-    def __call__(self, eval_pages: List[PageEvaluation]) -> ReportData:
-        """Adapts analyzer results to a context for report creation."""
-        if not eval_pages:
-            raise ValueError("No pages to evaluate.")
-        eval_pages = sort_by_url(eval_pages)
-        sitemap_list = sort_by_url(eval_pages)
+def adapter(eval_pages: List[PageEvaluation]) -> ReportData:
+    """Converts analyzer results to a format for the report."""
+    if not eval_pages:
+        raise ValueError("No pages to evaluate.")
+    eval_pages = sort_by_url(eval_pages)
+    sitemap_list = sort_by_url(eval_pages)
 
-        for page in eval_pages:
-            page.update_page_status()
+    for page in eval_pages:
+        page.update_page_status()
 
-        summary = create_status_summary(eval_pages)
-        descriptions = collect_test_descriptions(eval_pages)
-        common_tags = collect_common_tags(eval_pages)
+    summary = create_status_summary(eval_pages)
+    descriptions = collect_test_descriptions(eval_pages)
+    common_tags = collect_common_tags(eval_pages)
 
-        first_page = eval_pages[0]
-        report_data = ReportData(
-            url=first_page.url,
-            summary=summary,
-            sitemap=sitemap_list,
-            pages=eval_pages,
-            descriptions=descriptions,
-        )
-        if first_page.screenshot:
-            screenshot_bytes = base64.b64encode(first_page.screenshot).decode()
-            report_data.screenshot = screenshot_bytes
-        if common_tags:
-            report_data.tags = common_tags
-        return report_data
+    first_page = eval_pages[0]
+    report_data = ReportData(
+        url=first_page.url,
+        summary=summary,
+        sitemap=sitemap_list,
+        pages=eval_pages,
+        descriptions=descriptions,
+    )
+    if first_page.screenshot:
+        screenshot_bytes = base64.b64encode(first_page.screenshot).decode()
+        report_data.screenshot = screenshot_bytes
+    if common_tags:
+        report_data.tags = common_tags
+    return report_data
 
 
 def collect_test_descriptions(evaluated_pages: List[PageEvaluation]) -> List[TestDescription]:

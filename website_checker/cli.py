@@ -2,6 +2,7 @@ import click
 from loguru import logger
 
 from website_checker.analyze.analyzer import Analyzer
+from website_checker.analyze.result import adapter
 from website_checker.main import run_full_analysis
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -24,6 +25,7 @@ def main(url, rate_limit, max_pages, save):
     pdf_path, _, _ = run_full_analysis(
         url,
         analyzer,
+        converter=adapter,
         rate_limit=rate_limit,
         max_pages=max_pages,
         save_crawled_pages=save,
