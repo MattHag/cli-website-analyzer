@@ -1,17 +1,16 @@
 from pathlib import Path
-from unittest.mock import patch
+from unittest import mock
 
 import pytest
 from click.testing import CliRunner
 
 from website_checker.cli import main
-from website_checker.main import WebsiteChecker
 
 
 @pytest.fixture
 def mock_website_check():
-    with patch.object(WebsiteChecker, "check") as mock_check:
-        mock_check.return_value = Path("report.pdf")
+    mocked_result = (Path("report.pdf"), None, None)
+    with mock.patch("website_checker.cli.run_full_analysis", return_value=mocked_result) as mock_check:
         yield mock_check
 
 
