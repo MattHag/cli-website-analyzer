@@ -5,7 +5,7 @@ import pytest
 
 from website_checker.analyze import result
 from website_checker.analyze.base_analyzer import Result
-from website_checker.analyze.result import PageContextAdapter, PageEvaluation, Status
+from website_checker.analyze.result import PageEvaluation, Status, adapter
 from website_checker.report import report
 
 DEFAULT_HTML_OUTPUT = Path(__file__).parent.parent.parent.parent / "output" / "report.html"
@@ -44,27 +44,25 @@ def eval_pages():
 
 
 @pytest.fixture
-def adapted_context(eval_pages):
-    adapter = PageContextAdapter()
+def mock_report_data(eval_pages):
     return adapter(eval_pages)
 
 
-def test_html_report_jinja(tmp_file, adapted_context):
+def test_html_report_jinja(tmp_file, mock_report_data):
     output_file = tmp_file
-    html_file = report.HTMLReport().render(adapted_context, output_file)
+    html_file = report.HTMLReport().render(mock_report_data, output_file)
 
     assert html_file.exists()
 
 
-def test_pdf_report_jinja(tmp_file, adapted_context):
+def test_pdf_report_jinja(tmp_file, mock_report_data):
     output_file = tmp_file
-    pdf_file = report.PDFReport().render(adapted_context, output_file)
+    pdf_file = report.PDFReport().render(mock_report_data, output_file)
 
     assert pdf_file.exists()
 
 
 def test_adapter(eval_pages):
-    adapter = PageContextAdapter()
     context = adapter(eval_pages)
 
     assert len(context.pages[0].results) == 2
@@ -75,7 +73,6 @@ def test_adapter(eval_pages):
 def test_html_report_using_adapter(tmp_file, eval_pages):
     output_file = tmp_file
 
-    adapter = PageContextAdapter()
     context = adapter(eval_pages)
     html_file = report.HTMLReport().render(context, output_file)
 
@@ -85,7 +82,6 @@ def test_html_report_using_adapter(tmp_file, eval_pages):
 def test_pdf_report_using_adapter(tmp_file, eval_pages):
     output_file = tmp_file
 
-    adapter = PageContextAdapter()
     context = adapter(eval_pages)
     pdf_file = report.PDFReport().render(context, output_file)
 

@@ -2,12 +2,12 @@ import contextlib
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Protocol
-from typing import Union
+from typing import Protocol, Union
 
 from jinja2 import Environment, FileSystemLoader
 from playwright.async_api import PdfMargins
 from playwright.sync_api import sync_playwright
+
 
 class SupportsToDict(Protocol):
     def to_dict(self) -> dict:

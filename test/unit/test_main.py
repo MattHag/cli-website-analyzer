@@ -4,6 +4,7 @@ import pytest
 
 from website_checker import main
 from website_checker.analyze.analyzer import Analyzer
+from website_checker.analyze.result import adapter
 from website_checker.crawl.crawler import Crawler
 
 
@@ -17,6 +18,6 @@ def mock_crawler_next_once(page):
 def test_main(mock_crawler_next_once, mock_desktop_path):
     url = "https://domain.test"
     analyzer = Analyzer()
-    pdf_file, _, _ = main.run_full_analysis(url, analyzer)
+    pdf_file, _, _ = main.run_full_analysis(url, analyzer, adapter)
 
     assert pdf_file.is_file()

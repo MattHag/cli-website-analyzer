@@ -1,7 +1,6 @@
 from typing import List, Union
 
-from website_checker.analyze.result import Result
-from website_checker.analyze.result import Status
+from website_checker.analyze.result import Result, Status
 
 
 class BaseAnalyzer:

@@ -1,11 +1,9 @@
 import copy
-from dataclasses import asdict, dataclass
-from dataclasses import field
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from website_checker.analyze.result_data import StatusSummary
-from website_checker.analyze.result_data import TestDescription
+from website_checker.analyze.result_data import StatusSummary, TestDescription
 
 
 @dataclass
