@@ -47,13 +47,19 @@ class CheckExternalNetworkAccess(base_analyzer.BaseAnalyzer):
         external_resources = []
         for resource in page.failed_requests:
             if not is_internal_link(resource.url, domain):
-                external_resources.append(f"{resource.url}")
+                external_resources.append(f"{crop_and_add_ellipsis(resource.url[:150])}")
         for resource in page.elements:
             if not is_internal_link(resource.url, domain):
-                external_resources.append(resource.url)
+                external_resources.append(crop_and_add_ellipsis(resource.url))
 
         if external_resources:
             self.save_result(sorted(external_resources), Status.WARNING)
         else:
             self.save_result("Nice, no external network access detected.", Status.OK)
         return self
+
+
+def crop_and_add_ellipsis(text: str, max_length: int = 150) -> str:
+    if len(text) > max_length:
+        return f"{text[:max_length]}..."
+    return text
