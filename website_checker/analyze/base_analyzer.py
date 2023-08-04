@@ -1,5 +1,6 @@
 from typing import List, Union
 
+from website_checker.analyze.result import Result
 from website_checker.analyze.result import Status
 
 
@@ -12,7 +13,7 @@ class BaseAnalyzer:
         self.status = None
         self.tags = []
 
-    def check(self, page):
+    def check(self, page) -> Result:
         """Analyzes one page of a website and sets the results."""
         raise NotImplementedError
 
