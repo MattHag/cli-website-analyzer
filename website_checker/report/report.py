@@ -3,6 +3,7 @@ import tempfile
 from pathlib import Path
 
 from website_checker.report import utilities
+from website_checker.report.report_data import ReportData
 
 DEFAULT_TEMPLATE = Path(__file__).parent / "templates" / "base_template.html"
 
@@ -23,7 +24,7 @@ class ReportTemplate:
 
 
 class HTMLReport(ReportTemplate):
-    def render(self, data, html_path: Path) -> Path:
+    def render(self, data: ReportData, html_path: Path) -> Path:
         """Builds an HTML report from the given data."""
         if DEBUG:
             html_path = DEFAULT_HTML_OUTPUT
@@ -32,7 +33,7 @@ class HTMLReport(ReportTemplate):
 
 
 class PDFReport(HTMLReport):
-    def render(self, data, path: Path) -> Path:
+    def render(self, data: ReportData, path: Path) -> Path:
         """Builds a PDF report from the given data."""
         with tempfile.NamedTemporaryFile() as tmp_file:
             html = super().render(data, Path(tmp_file.name))

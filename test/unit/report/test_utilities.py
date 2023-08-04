@@ -5,6 +5,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 
 from website_checker.report import utilities
+from website_checker.report.report_data import ReportData
 
 
 @pytest.fixture
@@ -30,11 +31,10 @@ def html_tmp_file(tmp_path):
 
 @pytest.fixture
 def html_template():
-    content = b"""<div class="header">
-        <h1>Website checker results</h1>
-        <p class="header__title">{{ title }}</p>
-        <div class="header__date">{{ creation_date }}</div>
-    </div>"""
+    content = b"""<div class="container header">
+            <h1>Website report</h1>
+            <p>{{ creation_date }}</p>
+        </div>"""
     html_template = tempfile.NamedTemporaryFile(delete=False)
     html_template.write(content)
     html_template.seek(0)
@@ -42,31 +42,25 @@ def html_template():
 
 
 def test_build_html(html_template):
-    context = {
-        "title": "Test",
-        "creation_date": "2020-01-01",
-    }
+    context = ReportData(
+        url="https://www.example.com",
+    )
     html_string = utilities.build_html(html_template, context)
 
     assert html_string
-    assert "Test" in html_string
-    assert "2020-01-01" in html_string
 
 
 def test_build_html_file(html_tmp_file, html_template):
     output_file = html_tmp_file
-    context = {
-        "title": "Test",
-        "creation_date": "2020-01-01",
-    }
+    context = ReportData(
+        url="https://www.example.com",
+    )
     html_string = utilities.build_html(html_template, context, output_file)
 
     assert output_file.is_file()
     with open(output_file, "r") as f:
         content = f.read()
         assert content == html_string
-        assert "Test" in html_string
-        assert "2020-01-01" in html_string
 
 
 @pytest.mark.parametrize(

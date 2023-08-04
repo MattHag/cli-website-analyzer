@@ -8,15 +8,17 @@ from jinja2 import Environment, FileSystemLoader
 from playwright.async_api import PdfMargins
 from playwright.sync_api import sync_playwright
 
+from website_checker.report.report_data import ReportData
 
-def build_html(html_template: Union[str, Path], context, path: Union[None, str, Path] = None) -> str:
+
+def build_html(html_template: Union[str, Path], context: ReportData, path: Union[None, str, Path] = None) -> str:
     """Converts HTML to PDF.
 
     Parameters
     ----------
     html_template
         The HTML template file with Jinja2 variables.
-    context
+    context: ReportData
         The context to render the HTML template with.
     path
         The path to save the rendered HTML file to. If not given, the HTML is not written to a file.
@@ -31,7 +33,7 @@ def build_html(html_template: Union[str, Path], context, path: Union[None, str, 
 
     environment = Environment(loader=FileSystemLoader(template_dir))
     template = environment.get_template(template_name)
-    html_string = template.render(context)
+    html_string = template.render(context.to_dict())
 
     if path:
         with open(path, mode="w", encoding="utf-8") as results:
