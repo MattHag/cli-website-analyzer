@@ -5,13 +5,13 @@
         </div>
 
         <div class="container content-gap">
-            {%- for title, desc in descriptions -%}
+            {%- for entry in descriptions -%}
                 <article class="card">
                     <div class="card__header card__header--light">
-                        <h3>{{ title }}</h3>
+                        <h3>{{ entry.title }}</h3>
                     </div>
                     <div class="card__body content-gap">
-                        <p>{{ desc }}</p>
+                        <p>{{ entry.description }}</p>
                     </div>
                 </article>
             {% endfor %}
