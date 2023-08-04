@@ -29,20 +29,13 @@ def run_full_analysis(
     url,
     analyzer: SupportsRunChecks,
     converter: Callable[[List[PageEvaluation]], ReportData],
-    rate_limit=None,
-    max_pages=None,
-    save_crawled_pages=False,
+    options,
 ) -> Tuple[Path, List[PageEvaluation], List[WebsitePage]]:
     creation_datetime = _make_creation_datetime()
     domainname = utils.get_domain_as_text(url)
-    max_pages_option = f"{max_pages}p" if max_pages else "full"
+    max_pages_option = f"{options.max_pages}p" if options.max_pages else "full"
 
-    crawled_pages = crawl(
-        url,
-        rate_limit=rate_limit,
-        max_pages=max_pages,
-        save_data=save_crawled_pages,
-    )
+    crawled_pages = crawl(url, options)
 
     evaluation_result = evaluate(analyzer, crawled_pages)
 
@@ -51,15 +44,15 @@ def run_full_analysis(
     return pdf_path, evaluation_result, crawled_pages
 
 
-def crawl(url, rate_limit=False, max_pages=False, save_data=False) -> List[WebsitePage]:
+def crawl(url, options) -> List[WebsitePage]:
     pages = []
-    browser = Browser(rate_limit=rate_limit)
+    browser = Browser(rate_limit=options.rate_limit)
     with Crawler(browser, url) as crawler:
         for idx, page in enumerate(crawler, start=1):
             pages.append(page)
-            if max_pages and idx >= max_pages:
+            if options.max_pages and idx >= options.max_pages:
                 break
-    if save_data:
+    if options.save_pages:
         pickle.dump(pages, open(utils.get_desktop_path() / "pages.p", "wb"))
     return pages
 
