@@ -1,12 +1,13 @@
 import bisect
 import re
+import time
 import urllib
 from typing import Any, List, Set, Tuple
 from urllib.parse import ParseResult, urldefrag, urljoin, urlparse
 
 import requests
 from loguru import logger
-from playwright.sync_api import Page, Request, Response
+from playwright.sync_api import Page, Request, Response, ViewportSize
 
 from website_checker.crawl.cookie import Cookie
 from website_checker.crawl.crawlerbase import CrawlerBase
@@ -113,6 +114,11 @@ class Crawler(CrawlerBase):
 
             self._gather_new_links(page, current_url)
 
+            viewport_sizes = [(320, 480), (480, 640), (768, 1024), (1024, 768), (1280, 720), (1920, 1080), (2560, 1440)]
+            for size in viewport_sizes:
+                vp_size = ViewportSize(width=size[0], height=size[1])
+                create_screenshot(page, vp_size)
+
             return WebsitePage(
                 url=current_url,
                 title=title,
@@ -168,6 +174,13 @@ class Crawler(CrawlerBase):
         if not self.responses:
             download.cancel()
             raise NoPageException(download.url)
+
+
+def create_screenshot(page: Page, viewport_size: ViewportSize) -> bytes:
+    """Creates a screenshot of the page."""
+    page.set_viewport_size(viewport_size)
+    time.sleep(0.2)
+    return page.screenshot(path=f"screenshots/full_{viewport_size['width']}x{viewport_size['height']}.png")
 
 
 def link_already_visited(url: str, visited_links: Set[str]):
