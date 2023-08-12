@@ -33,16 +33,12 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     author="Matthias Hagmann",
     license="MIT",
-    packages=setuptools.find_packages(
-        exclude=[
-            "examples",
-            "test",
-        ]
-    ),
+    include_package_data=True,
+    packages=["website_checker"],
     package_data={
         "website_checker": [
             "py.typed",
-        ]
+        ],
     },
     classifiers=[
         "Programming Language :: Python :: 3",

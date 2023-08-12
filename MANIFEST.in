@@ -1,0 +1,3 @@
+prune test
+graft website_checker/check/cookies_data/csv
+graft website_checker/report/templates
