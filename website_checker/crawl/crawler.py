@@ -41,7 +41,6 @@ class Crawler(CrawlerBase):
         self.responses: List = []
         self.requests: List = []
         self.failed_requests: List = []
-        self.screenshot: Any = None
 
         self._add_url(url)  # add start url
 
