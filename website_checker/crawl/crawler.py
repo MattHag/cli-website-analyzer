@@ -9,7 +9,6 @@ from loguru import logger
 from playwright.sync_api import Page, Request, Response
 
 from website_checker.crawl.cookie import Cookie
-from website_checker.crawl.crawlerbase import CrawlerBase
 from website_checker.crawl.resource import Resource, ResourceRequest
 from website_checker.crawl.websitepage import WebsitePage
 
@@ -31,7 +30,7 @@ class NoPageException(CrawlerException):
     pass
 
 
-class Crawler(CrawlerBase):
+class Crawler:
     def __init__(self, browser, url: str):
         self._browser = browser
         self.domain = get_base_domain(url)
