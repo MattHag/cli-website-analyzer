@@ -52,3 +52,4 @@ class Browser:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.playwright.stop()
+        self.playwright = None

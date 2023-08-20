@@ -43,7 +43,7 @@ class MyRequestHandler(server.SimpleHTTPRequestHandler):
         return super().do_GET()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def test_server():
     server_address = ("localhost", 8000)
     logger.info("Start server")

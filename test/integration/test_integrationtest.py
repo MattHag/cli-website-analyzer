@@ -3,13 +3,15 @@ import os
 from website_checker import main
 from website_checker.analyze.analyzer import Analyzer
 from website_checker.analyze.result import Status, adapter
+from website_checker.crawl.browser import Browser
+from website_checker.crawl.crawler import Crawler
 
 DEBUG = False
 if os.environ.get("DEBUG"):
     DEBUG = True
 
 
-def test_integrationtest(test_server, mock_desktop_path):
+def test_run_full_analysis(test_server, mock_desktop_path):
     url = test_server
     expected_pdf_signature = b"%PDF"
 
@@ -32,3 +34,36 @@ def test_integrationtest(test_server, mock_desktop_path):
 
     if DEBUG:
         pdf_file.rename(main.DEFAULT_OUTPUT_PATH / "test_integrationtest.pdf")
+
+
+def test_crawl_nothing(test_server, mock_desktop_path):
+    url = test_server
+
+    browser = Browser()
+    start_url = f"{url}/dummy.pdf"
+    with Crawler(browser, start_url) as crawler:
+        for _ in crawler:
+            assert False, "Should not be reached"
+
+    assert True
+
+
+def test_crawler(test_server, mock_desktop_path):
+    url = test_server
+    expected_visited_links = {f"{url}/", url, f"{url}/contact"}
+
+    browser = Browser()
+    pages = []
+    with Crawler(browser, url) as crawler:
+        assert crawler.domain == url
+
+        for idx, page in enumerate(crawler, start=1):
+            pages.append(page)
+
+            assert page.title is not None
+            assert page.html is not None
+            assert page.url is not None
+            assert page.screenshot is not None
+
+        assert crawler.visited_links == expected_visited_links
+    assert len(pages) == 2
