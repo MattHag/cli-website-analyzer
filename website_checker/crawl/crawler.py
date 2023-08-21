@@ -177,11 +177,11 @@ def link_already_visited(url: str, visited_links: Set[str]):
 
 def get_unvisited_links(links: Set[str], visited_links: Set[str], domain: str) -> Set[str]:
     """Returns a set of unvisited internal pages."""
-    links = {link.rstrip("/") for link in links if type(link) == str}
+    links = {link.rstrip("/") for link in links if isinstance(link, str)}
     visited_links = {link.rstrip("/") for link in visited_links}
     unvisited_links = links - visited_links
 
-    internal_links = {link for link in unvisited_links if type(link) == str and is_internal_link(link, domain)}
+    internal_links = {link for link in unvisited_links if isinstance(link, str) and is_internal_link(link, domain)}
     images = (".png", ".jpg", ".jpeg", ".webp", "avif")
     unvisited_internal_pages = {link for link in internal_links if not link.endswith(images)}
     return unvisited_internal_pages

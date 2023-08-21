@@ -47,9 +47,9 @@ def build_html(html_template: Union[str, Path], context: SupportsToDict, path: U
 def _text_to_file(text: Union[bytes, str]) -> Path:
     """Returns a temporary file with given content."""
     tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".html")
-    if type(text) is str:
+    if isinstance(text, str):
         text = bytes(text, encoding="utf-8")
-    assert type(text) is bytes
+    assert isinstance(text, bytes)
     tmp_file.write(text)
     tmp_file.seek(0)
     # TODO close file
@@ -83,9 +83,9 @@ def html_to_pdf(html: Union[bytes, str, Path], path: Union[None, str, Path] = No
     -------
     The PDF file as bytes.
     """
-    if type(html) is bytes:
+    if isinstance(html, bytes):
         html = _text_to_file(html)
-    elif type(html) is str:
+    elif isinstance(html, str):
         if Path(html).is_file():
             html = Path(html)
         else:

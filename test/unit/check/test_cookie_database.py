@@ -48,7 +48,7 @@ def test_load_cookie_database(database_csv):
     with cookie_database.CookieDatabase(database_csv) as cookie_db:
         res = cookie_db.data
 
-    assert type(res) == dict
+    assert isinstance(res, dict)
     assert len(res) == len(COOKIE_CSV_EXAMPLE) - 1
 
 
@@ -57,7 +57,7 @@ def test_search_cookie_database(database_csv):
     with cookie_database.CookieDatabase(database_csv) as cookie_db:
         res = cookie_db.search(cookie_name)
 
-    assert type(res) == dict
+    assert isinstance(res, dict)
     assert res["cookie_name"] == cookie_name
     assert res["platform"] == "Cookiebot"
     assert res["category"] == "Functional"
@@ -81,7 +81,7 @@ def test_search_with_wildcard(cookie_name, identifier, database_csv):
     with cookie_database.CookieDatabase(database_csv) as cookie_db:
         res = cookie_db.search(cookie_name)
 
-    assert type(res) == dict
+    assert isinstance(res, dict)
     assert res["cookie_name"] == cookie_name
     assert res["id"] == identifier
     assert res["platform"] == "Google Analytics"

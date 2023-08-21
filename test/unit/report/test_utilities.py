@@ -76,7 +76,7 @@ def test_html_to_pdf_bytes(html_input, request):
     html = request.getfixturevalue(html_input)
     pdf_bytes = utilities.html_to_pdf(html)
 
-    assert type(pdf_bytes) == bytes
+    assert isinstance(pdf_bytes, bytes)
     assert pdf_bytes[:4] == expected_pdf_signature
 
 

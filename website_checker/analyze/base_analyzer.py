@@ -39,7 +39,7 @@ class BaseAnalyzer:
                         "table": {"entries": data["entries"]},
                     }
                 )
-        if type(data) == str:
+        if isinstance(data, str):
             self.result.update({"text": data})
 
         self._set_status(status)
