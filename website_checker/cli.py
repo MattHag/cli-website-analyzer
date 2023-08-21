@@ -5,7 +5,7 @@ from website_checker.analyze.analyzer import Analyzer
 from website_checker.analyze.result import adapter
 from website_checker.main import run_full_analysis
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
 @click.command(context_settings=CONTEXT_SETTINGS)

@@ -30,7 +30,7 @@ COOKIE_CSV_EXAMPLE = [
         "256c1eba-d881-11e9-8a34-2a2ae2dbcce4,Google Analytics,Analytics,AMP_TOKEN,google-analytics.com (3rd party) or"
         " advertiser's website domain (1st party),\"Contains a token code that is used to read out a Client ID from the"
         " AMP Client ID Service. By matching this ID with that of Google Analytics, users can be matched when switching"
-        " between AMP content and non-AMP content.\""
+        ' between AMP content and non-AMP content."'
     ),
 ]
 

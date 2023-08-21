@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 
 def get_domain_as_text(url):
     parsed_url = urlparse(url)
-    parsed_url = re.sub(r':\d+', '', parsed_url.netloc)  # remove port
+    parsed_url = re.sub(r":\d+", "", parsed_url.netloc)  # remove port
     return parsed_url.replace(".", "-")
 
 
