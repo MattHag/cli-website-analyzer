@@ -1,7 +1,11 @@
 [tool.black]
-preview = true
 line-length = 120
-skip-string-normalization = true
 
-[tool.isort]
-profile = "black"
+[tool.ruff]
+line-length = 120
+select = [
+    "E",
+    "F",
+    "I",
+    "W",
+]

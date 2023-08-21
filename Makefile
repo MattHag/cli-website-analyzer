@@ -33,10 +33,10 @@ black-check:
 	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/ --check
 
 ## format - Runs all formatting tools against the project
-format: black isort lint
+format: black ruff
 
-## format-check - Checks if the project is formatted correctly against all formatting rules
-format-check: black-check isort-check lint
+## lint - Lint the project
+lint: black-check ruff-check
 
 ## install - Install the project locally
 install:
@@ -48,17 +48,13 @@ install:
 install-pre-commit:
 	$(VIRTUAL_BIN)/pre-commit install
 
-## isort - Sorts imports throughout the project
-isort:
-	$(VIRTUAL_BIN)/isort $(PROJECT_NAME)/ $(TEST_DIR)/
+## ruff - Sorts, cleans and formats the project
+ruff:
+	$(VIRTUAL_BIN)/ruff --fix $(PROJECT_NAME)/ $(TEST_DIR)/
 
-## isort-check - Checks that imports throughout the project are sorted correctly
-isort-check:
-	$(VIRTUAL_BIN)/isort $(PROJECT_NAME)/ $(TEST_DIR)/ --check-only
-
-## lint - Lint the project
-lint:
-	$(VIRTUAL_BIN)/flake8 $(PROJECT_NAME)/ $(TEST_DIR)/
+## ruff-check - Checks import sorting and formatting of the project
+ruff-check:
+	$(VIRTUAL_BIN)/ruff $(PROJECT_NAME)/ $(TEST_DIR)/
 
 ## mypy - Run mypy type checking on the project
 mypy:
@@ -78,4 +74,4 @@ docs:
 update:
 	cd $(PROJECT_NAME)/check/cookies_data/ && $(PYTHON_BINARY) cookie_database.py
 
-.PHONY: help build coverage clean black black-check format format-check install install-pre-commit isort isort-check lint mypy test docs update
+.PHONY: help build coverage clean black black-check format format-check install install-pre-commit lint mypy test docs update
